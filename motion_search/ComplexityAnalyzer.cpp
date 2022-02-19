@@ -31,13 +31,13 @@ ComplexityAnalyzer::ComplexityAnalyzer(IVideoSequenceReader *reader) :
 	int stride_MB = m_width/MB_WIDTH+2;
 	int padded_height_MB = (m_height+MB_WIDTH-1)/MB_WIDTH+2;
 
-	m_mses = (int *) _aligned_malloc((stride_MB)*(padded_height_MB)*sizeof(int),16);
+	m_mses = (int *) aligned_alloc((stride_MB)*(padded_height_MB)*sizeof(int),16);
 	if(m_mses==NULL)
 	{
 		printf("Not enough memory (%d bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(int),"m_mses");
 		exit(-1);
 	}
-	m_MB_modes = (unsigned char *) _aligned_malloc((stride_MB)*(padded_height_MB)*sizeof(unsigned char),16);
+	m_MB_modes = (unsigned char *) aligned_alloc((stride_MB)*(padded_height_MB)*sizeof(unsigned char),16);
 	if(m_MB_modes==NULL)
 	{
 		printf("Not enough memory (%d bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(unsigned char),"m_MB_modes");
@@ -50,8 +50,8 @@ ComplexityAnalyzer::~ComplexityAnalyzer(void)
 {
 	pics.clear();
 
-	_aligned_free(m_MB_modes);
-	_aligned_free(m_mses);
+	free(m_MB_modes);
+	free(m_mses);
 
 	delete m_pPmv;
 	delete m_pB1mv;

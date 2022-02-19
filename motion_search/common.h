@@ -8,7 +8,6 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 #include <emmintrin.h>
-#include <Windows.h>
 
 // The following guarantee there is enough room for diamond search to search in extended area
 #define HORIZONTAL_PADDING 32

@@ -18,14 +18,14 @@ MotionVectorField::MotionVectorField(int width, int height, int stride, int padd
 	int num_blocks = stride_MB*padded_height_MB;
 
 	m_numMVbytes  = num_blocks * sizeof(MV);
-	m_pMVs  = (MV *) _aligned_malloc(m_numMVbytes, 16);
+	m_pMVs  = (MV *) aligned_alloc(m_numMVbytes, 16);
 	if (m_pMVs == NULL) {
 		printf("Not enough memory (%d bytes) for motion vectors\n", m_numMVbytes);
 		exit(-1);
 	}
 
 	int num_sad_bytes = num_blocks * sizeof(int);
-	m_pSADs  = (int *) _aligned_malloc(num_sad_bytes, 16);
+	m_pSADs  = (int *) aligned_alloc(num_sad_bytes, 16);
 	if (m_pSADs == NULL) {
 		printf("Not enough memory (%d bytes) for SADs\n", num_sad_bytes);
 		exit(-1);
@@ -48,8 +48,8 @@ MotionVectorField::MotionVectorField(int width, int height, int stride, int padd
 
 MotionVectorField::~MotionVectorField(void)
 {
-	_aligned_free(m_pMVs);
-	_aligned_free(m_pSADs);
+	free(m_pMVs);
+	free(m_pSADs);
 }
 
 

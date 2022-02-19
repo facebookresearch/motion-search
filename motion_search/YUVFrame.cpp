@@ -14,7 +14,7 @@ YUVFrame::YUVFrame(IVideoSequenceReader *rdr) : m_width(rdr->width()),
 {
 	int frame_size = m_stride * m_padded_height * 3 * sizeof(uint8_t) / 2;
 
-	m_pFrame = (uint8_t *) _aligned_malloc(frame_size, 16);
+	m_pFrame = (uint8_t *) aligned_alloc(frame_size, 16);
 	if (m_pFrame == NULL) {
 		printf("Not enough memory (%d bytes) for YUVFrame\n", frame_size);
 		exit(-1);
@@ -32,7 +32,7 @@ YUVFrame::YUVFrame(IVideoSequenceReader *rdr) : m_width(rdr->width()),
 
 YUVFrame::~YUVFrame(void)
 {
-	_aligned_free((void *) m_pFrame);
+	free((void *) m_pFrame);
 }
 
 

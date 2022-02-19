@@ -1,5 +1,5 @@
 #pragma once
-#include "ivideosequencereader.h"
+#include "IVideoSequenceReader.h"
 class BaseVideoSequenceReader : public IVideoSequenceReader
 {
 public:

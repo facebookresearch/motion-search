@@ -1,5 +1,4 @@
 #include "YUVSequenceReader.h"
-#include "AVSFileReader.h"
 #include "ComplexityAnalyzer.h"
 
 #include <algorithm>
@@ -23,8 +22,6 @@ IVideoSequenceReader *getReader (string filename, int width, int height)
 
 		if (ext.compare(".yuv") == 0)
 			pReader = new YUVSequenceReader(filename, width, height);
-		else if (ext.compare(".avs") == 0)
-			pReader = new AVSFileReader(filename);
 	}
 
 	return pReader;
@@ -108,21 +105,20 @@ void print_compl_inf (complexity_info_t *i)
 
 int main(int argc, char *argv[])
 {
-	time_t rawtime;
-
-	time ( &rawtime );
-  
-	parse_options(argc, argv);
+    parse_options(argc, argv);
 	IVideoSequenceReader *reader = getReader(inputFile, width, height);
+
+    if (reader == nullptr) {
+        fprintf(stderr, "Unsupported input format for %s\n", inputFile);
+        return 1;
+    }
+
 	ComplexityAnalyzer analyzer(reader);
 
-	int time1 = GetTickCount();
 	analyzer.analyze();
-	int time2 = GetTickCount();
 
 	pOut = fopen (outputFile, "w");
 
-	fprintf(pOut, "current time is: %s", ctime (&rawtime));
 	fprintf(pOut, "input_file: '%s'\n", inputFile);
 	fprintf(pOut, "width %d\n", reader->width());
 	fprintf(pOut, "height %d\n", reader->height());
@@ -131,9 +127,6 @@ int main(int argc, char *argv[])
 
 	vector<complexity_info_t *> info = analyzer.getInfo();
 	for_each(info.begin(), info.end(), print_compl_inf);
-
-	fprintf(pOut, "Execution time = %d msec\n",time2-time1);
-
 	fclose(pOut);
 
 	return 0;
