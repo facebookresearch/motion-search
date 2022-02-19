@@ -1,6 +1,6 @@
 # motion-search
 
-Perform encoder complexity estimation using motion estimation
+Perform motion search and compute motion vectors and residual information in order to extract features for predicting video compressibility.
 
 ## Building
 
