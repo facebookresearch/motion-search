@@ -4,10 +4,12 @@ Perform motion search and compute motion vectors and residual information in ord
 
 ## Building
 
+``` shell
 mkdir build
 cd build
 cmake ..
 make
+```
 
 
 ## Running
