@@ -14,4 +14,6 @@ make
 
 ## Running
 
+``` shell
 ./motion-search input.yuv <width> <height> complexity.txt
+```
