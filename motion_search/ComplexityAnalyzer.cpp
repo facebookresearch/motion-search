@@ -31,13 +31,13 @@ ComplexityAnalyzer::ComplexityAnalyzer(IVideoSequenceReader *reader) :
 	int stride_MB = m_width/MB_WIDTH+2;
 	int padded_height_MB = (m_height+MB_WIDTH-1)/MB_WIDTH+2;
 
-	m_mses = std::move(memory::AlignedAlloc<int> ((stride_MB)*(padded_height_MB)));
+	m_mses = memory::AlignedAlloc<int> ((stride_MB)*(padded_height_MB));
 	if(m_mses==NULL)
 	{
 		printf("Not enough memory (%zu bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(int),"m_mses");
 		exit(-1);
 	}
-	m_MB_modes = std::move(memory::AlignedAlloc<unsigned char> ((stride_MB)*(padded_height_MB)));
+	m_MB_modes = memory::AlignedAlloc<unsigned char> ((stride_MB)*(padded_height_MB));
 	if(m_MB_modes==NULL)
 	{
 		printf("Not enough memory (%zu bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(unsigned char),"m_MB_modes");

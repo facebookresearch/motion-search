@@ -17,13 +17,13 @@ MotionVectorField::MotionVectorField(int width, int height, int stride, int padd
 	int padded_height_MB = (height+MB_WIDTH-1)/MB_WIDTH+2;
     m_num_blocks = stride_MB*padded_height_MB;
 
-	m_pMVs = std::move(memory::AlignedAlloc<MV> (m_num_blocks));
+	m_pMVs = memory::AlignedAlloc<MV> (m_num_blocks);
 	if (m_pMVs == NULL) {
 		printf("Not enough memory (%zu bytes) for motion vectors\n", m_num_blocks * sizeof(MV));
 		exit(-1);
 	}
 
-	m_pSADs = std::move(memory::AlignedAlloc<int> (m_num_blocks));
+	m_pSADs = memory::AlignedAlloc<int> (m_num_blocks);
 	if (m_pSADs == NULL) {
 		printf("Not enough memory (%zu bytes) for SADs\n", m_num_blocks * sizeof(int));
 		exit(-1);

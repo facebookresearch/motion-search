@@ -16,7 +16,8 @@ void *aligned_malloc(const size_t size) {
 #if defined(_MSC_VER)
     return _aligned_malloc(size, ALIGN);
 #else
-    return std::aligned_alloc(ALIGN, size);
+    const auto alignedSize = (size + ALIGN - 1) & -ALIGN;
+    return aligned_alloc(ALIGN, alignedSize);
 #endif
 }
 
