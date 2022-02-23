@@ -1,5 +1,11 @@
 
-#include <memory_tools.h>
+#include <motion_search/inc/memory.h>
+
+#if defined(_MSC_VER)
+#include <malloc.h>
+#else
+#include <cstdlib>
+#endif
 
 enum {
     ALIGN = 64
@@ -7,27 +13,20 @@ enum {
 
 extern "C"
 void *aligned_malloc(const size_t size) {
-    size_t allocSize = size + ALIGN + sizeof(void **);
-    void *pAllocated = (uint8_t *) malloc(allocSize);
-
-    if (!pAllocated) {
-        return nullptr;
-    }
-
-    void *pToReturn = (void *) (((size_t) pAllocated + sizeof(void **) + ALIGN - 1) &
-        -ALIGN);
-    ((void **) pToReturn)[-1] = pAllocated;
-
-    return pToReturn;
+#if defined(_MSC_VER)
+    return _aligned_malloc(size, ALIGN);
+#else
+    return std::aligned_alloc(ALIGN, size);
+#endif
 }
 
 extern "C"
 void aligned_free(void *p) {
-    if (!p) {
-        return;
-    }
-
-    free(((void **) p)[-1]);
+#if defined(_MSC_VER)
+    _aligned_free(p);
+#else
+    std::free(p);
+#endif
 }
 
 namespace memory {
