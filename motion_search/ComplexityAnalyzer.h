@@ -61,4 +61,7 @@ private:
 	void process_i_picture(YUVFrame *pict);
 	void process_p_picture(YUVFrame *pict, YUVFrame *ref);
 	void process_b_picture(YUVFrame *pict, YUVFrame *fwdref, YUVFrame *backref);
+
+    ComplexityAnalyzer(ComplexityAnalyzer &) = delete;
+    ComplexityAnalyzer & operator = (ComplexityAnalyzer &) = delete;
 };

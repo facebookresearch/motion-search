@@ -1,8 +1,8 @@
 #pragma once
 
+#include "common.h"
 #include <motion_search/inc/memory.h>
 #include "IVideoSequenceReader.h"
-#include "common.h"
 
 class YUVFrame
 {
@@ -36,5 +36,8 @@ private:
 	IVideoSequenceReader *m_pReader;
 
 	int m_pos;
+
+    YUVFrame(YUVFrame &) = delete;
+    YUVFrame & operator = (YUVFrame &) = delete;
 };
 

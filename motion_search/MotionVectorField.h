@@ -51,4 +51,7 @@ private:
 	int m_count_P;
 	int m_count_B;
 	int m_bits;
+
+    MotionVectorField(MotionVectorField &) = delete;
+    MotionVectorField & operator = (MotionVectorField &) = delete;
 };
