@@ -2,6 +2,7 @@
 
 #include "common.h"
 
+#include <motion_search/inc/memory.h>
 #include "IVideoSequenceReader.h"
 #include "MotionVectorField.h"
 
@@ -47,8 +48,8 @@ private:
 	MotionVectorField *m_pB1mv;
 	MotionVectorField *m_pB2mv;
 
-	int *m_mses;
-	unsigned char *m_MB_modes;
+    memory::aligned_unique_ptr<int> m_mses;
+    memory::aligned_unique_ptr<unsigned char> m_MB_modes;
 
 	IVideoSequenceReader *m_pReader;
 

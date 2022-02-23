@@ -10,6 +10,7 @@ add_compile_options(-fms-extensions)
 
 # Create library : libmotion_search
 add_library(motion_search
+    "motion_search/src/memory.cpp"
     "motion_search/BaseVideoSequenceReader.cpp"
 #    "motion_search/BaseVideoSequenceReader.h"
     "motion_search/ComplexityAnalyzer.cpp"

@@ -23,16 +23,23 @@ namespace memory {
 struct aligned_deallocator {
     template <typename data_t>
     void operator () (data_t *p) {
+        static_assert(std::is_trivially_destructible<data_t>::value,
+            "objects should have no or a trivial desctructor");
         aligned_free(p);
     }
 };
 
+template <typename data_t>
+using aligned_unique_ptr = std::unique_ptr<data_t, aligned_deallocator>;
+
 template <typename data_t> inline
-std::unique_ptr<data_t, aligned_deallocator> AlignedAlloc(const size_t numItems) {
-    static_assert(std::is_fundamental<data_t>::value,
-        "simple fundamental type is required");
+aligned_unique_ptr<data_t> AlignedAlloc(const size_t numItems) {
     const size_t size = sizeof(data_t) * numItems;
     std::unique_ptr<data_t, aligned_deallocator> p((data_t *) aligned_malloc(size));
+    if constexpr (!std::is_trivial<data_t>::value) {
+        // call constructors
+        data_t *items = new(p.get()) data_t[numItems];
+    }
     return p;
 }
 

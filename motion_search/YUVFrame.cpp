@@ -14,7 +14,7 @@ YUVFrame::YUVFrame(IVideoSequenceReader *rdr) : m_width(rdr->width()),
 {
 	int frame_size = m_stride * m_padded_height * 3 * sizeof(uint8_t) / 2;
 
-	m_pFrame = (uint8_t *) aligned_alloc(frame_size, 16);
+	m_pFrame = std::move(memory::AlignedAlloc<uint8_t> (frame_size));
 	if (m_pFrame == NULL) {
 		printf("Not enough memory (%d bytes) for YUVFrame\n", frame_size);
 		exit(-1);
@@ -24,15 +24,14 @@ YUVFrame::YUVFrame(IVideoSequenceReader *rdr) : m_width(rdr->width()),
 	int cr_offset = m_stride * m_padded_height + VER_PADDING_UV * m_stride / 2 + HOR_PADDING_UV;
 	int cb_offset = cr_offset + (m_stride/2) * (m_padded_height/2);
 
-	m_pY = m_pFrame + luma_offset;
-	m_pU = m_pFrame + cr_offset;
-	m_pV = m_pFrame + cb_offset;
+	m_pY = m_pFrame.get() + luma_offset;
+	m_pU = m_pFrame.get() + cr_offset;
+	m_pV = m_pFrame.get() + cb_offset;
 }
 
 
 YUVFrame::~YUVFrame(void)
 {
-	free((void *) m_pFrame);
 }
 
 
