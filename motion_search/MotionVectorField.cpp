@@ -15,41 +15,37 @@ MotionVectorField::MotionVectorField(int width, int height, int stride, int padd
 	int i,j;
 	int stride_MB = width/MB_WIDTH+2;
 	int padded_height_MB = (height+MB_WIDTH-1)/MB_WIDTH+2;
-	int num_blocks = stride_MB*padded_height_MB;
+    m_num_blocks = stride_MB*padded_height_MB;
 
-	m_numMVbytes  = num_blocks * sizeof(MV);
-	m_pMVs  = (MV *) aligned_alloc(m_numMVbytes, 16);
+	m_pMVs = memory::AlignedAlloc<MV> (m_num_blocks);
 	if (m_pMVs == NULL) {
-		printf("Not enough memory (%d bytes) for motion vectors\n", m_numMVbytes);
+		printf("Not enough memory (%zu bytes) for motion vectors\n", m_num_blocks * sizeof(MV));
 		exit(-1);
 	}
 
-	int num_sad_bytes = num_blocks * sizeof(int);
-	m_pSADs  = (int *) aligned_alloc(num_sad_bytes, 16);
+	m_pSADs = memory::AlignedAlloc<int> (m_num_blocks);
 	if (m_pSADs == NULL) {
-		printf("Not enough memory (%d bytes) for SADs\n", num_sad_bytes);
+		printf("Not enough memory (%zu bytes) for SADs\n", m_num_blocks * sizeof(int));
 		exit(-1);
 	}
 
 	for(j=0;j<stride_MB;j++)
 	{
-		m_pSADs[j] = BORDER_SADS;
+		m_pSADs.get()[j] = BORDER_SADS;
 	}
 	for(i=1;i<padded_height_MB-1;i++)
 	{
-		m_pSADs[i*stride_MB] = m_pSADs[(i+1)*stride_MB-1] = BORDER_SADS;
+		m_pSADs.get()[i*stride_MB] = m_pSADs.get()[(i+1)*stride_MB-1] = BORDER_SADS;
 	}
 	for(j=0;j<stride_MB;j++)
 	{
-		m_pSADs[i*stride_MB+j] = BORDER_SADS;
+		m_pSADs.get()[i*stride_MB+j] = BORDER_SADS;
 	}
 }
 
 
 MotionVectorField::~MotionVectorField(void)
 {
-	free(m_pMVs);
-	free(m_pSADs);
 }
 
 
@@ -57,7 +53,7 @@ int MotionVectorField::predictSpatial(YUVFrame *pFrm, int *mses, unsigned char *
 {
 	return spatial_search(pFrm->y(), pFrm->y(), 
 		pFrm->stride(), pFrm->width(), pFrm->height(), m_blocksize, m_blocksize, 
-		&m_pMVs[m_firstMB], &m_pSADs[m_firstMB], mses, MB_modes,
+		&m_pMVs.get()[m_firstMB], &m_pSADs.get()[m_firstMB], mses, MB_modes,
 		&m_count_I, &m_bits);
 
 }
@@ -67,7 +63,7 @@ int MotionVectorField::predictTemporal(YUVFrame *pCurFrm, YUVFrame *pRefFrm, int
 {
 	return motion_search(pCurFrm->y(), pRefFrm->y(), 
 		pCurFrm->stride(), pCurFrm->width(), pCurFrm->height(), m_blocksize, m_blocksize, 
-		&m_pMVs[m_firstMB], &m_pSADs[m_firstMB], mses, MB_modes,
+		&m_pMVs.get()[m_firstMB], &m_pSADs.get()[m_firstMB], mses, MB_modes,
 		&m_count_I, &m_count_P, &m_bits);
 }
 
@@ -90,5 +86,5 @@ int MotionVectorField::predictBidirectional(YUVFrame *pCurFrm, YUVFrame *pRefFrm
 
 void MotionVectorField::reset(void)
 {
-	memset(m_pMVs, 0, m_numMVbytes);
+    memset(m_pMVs.get(), 0, m_num_blocks * sizeof(MV));
 }

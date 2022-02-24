@@ -31,5 +31,8 @@ private:
 	FILE *m_pFile;
 
 	void readComponent(uint8_t *pData, bool isLuma);
+
+    YUVSequenceReader(YUVSequenceReader &) = delete;
+    YUVSequenceReader & operator = (YUVSequenceReader &) = delete;
 };
 

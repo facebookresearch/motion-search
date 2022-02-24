@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project (motion_search VERSION 0.0.1 DESCRIPTION "compute motion search for video complexity estimation")
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 include(GNUInstallDirs)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
@@ -10,6 +10,7 @@ add_compile_options(-fms-extensions)
 
 # Create library : libmotion_search
 add_library(motion_search
+    "motion_search/src/memory.cpp"
     "motion_search/BaseVideoSequenceReader.cpp"
 #    "motion_search/BaseVideoSequenceReader.h"
     "motion_search/ComplexityAnalyzer.cpp"
@@ -42,6 +43,9 @@ target_link_libraries (motion-search LINK_PUBLIC motion_search)
 set_target_properties(motion_search PROPERTIES PUBLIC_HEADER motion_search/motion_search.h)
 
 target_include_directories(motion_search PRIVATE
+  ${CMAKE_SOURCE_DIR}
+)
+target_include_directories(motion-search PRIVATE
   ${CMAKE_SOURCE_DIR}
 )
 

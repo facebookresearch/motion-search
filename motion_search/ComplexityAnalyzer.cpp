@@ -31,16 +31,16 @@ ComplexityAnalyzer::ComplexityAnalyzer(IVideoSequenceReader *reader) :
 	int stride_MB = m_width/MB_WIDTH+2;
 	int padded_height_MB = (m_height+MB_WIDTH-1)/MB_WIDTH+2;
 
-	m_mses = (int *) aligned_alloc((stride_MB)*(padded_height_MB)*sizeof(int),16);
+	m_mses = memory::AlignedAlloc<int> ((stride_MB)*(padded_height_MB));
 	if(m_mses==NULL)
 	{
-		printf("Not enough memory (%d bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(int),"m_mses");
+		printf("Not enough memory (%zu bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(int),"m_mses");
 		exit(-1);
 	}
-	m_MB_modes = (unsigned char *) aligned_alloc((stride_MB)*(padded_height_MB)*sizeof(unsigned char),16);
+	m_MB_modes = memory::AlignedAlloc<unsigned char> ((stride_MB)*(padded_height_MB));
 	if(m_MB_modes==NULL)
 	{
-		printf("Not enough memory (%d bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(unsigned char),"m_MB_modes");
+		printf("Not enough memory (%zu bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(unsigned char),"m_MB_modes");
 		exit(-1);
 	}
 }
@@ -49,9 +49,6 @@ ComplexityAnalyzer::ComplexityAnalyzer(IVideoSequenceReader *reader) :
 ComplexityAnalyzer::~ComplexityAnalyzer(void)
 {
 	pics.clear();
-
-	free(m_MB_modes);
-	free(m_mses);
 
 	delete m_pPmv;
 	delete m_pB1mv;
@@ -94,7 +91,7 @@ void ComplexityAnalyzer::add_info (int num, char p, int err, int count_I, int co
 void ComplexityAnalyzer::process_i_picture(YUVFrame *pict)
 {
 	reset_gop_start();
-	int error = m_pPmv->predictSpatial(pict, &m_mses[m_pPmv->firstMB()], &m_MB_modes[m_pPmv->firstMB()]);
+	int error = m_pPmv->predictSpatial(pict, &m_mses.get()[m_pPmv->firstMB()], &m_MB_modes.get()[m_pPmv->firstMB()]);
 	int bits = m_pPmv->bits();
 
 	//We are weighting I-frames by 10% more bits (282/256), since the QP needs to be the lowest among I/P/B
@@ -111,7 +108,7 @@ void ComplexityAnalyzer::process_i_picture(YUVFrame *pict)
 
 void ComplexityAnalyzer::process_p_picture(YUVFrame *pict, YUVFrame *ref)
 {
-	int error = m_pPmv->predictTemporal(pict, ref, &m_mses[m_pPmv->firstMB()], &m_MB_modes[m_pPmv->firstMB()]);
+	int error = m_pPmv->predictTemporal(pict, ref, &m_mses.get()[m_pPmv->firstMB()], &m_MB_modes.get()[m_pPmv->firstMB()]);
 	int bits = m_pPmv->bits();
 
 	//We are weighting P-frames by 5% more bits (269/256), since the QP needs to be lower than B (but higher than I)
@@ -128,7 +125,7 @@ void ComplexityAnalyzer::process_p_picture(YUVFrame *pict, YUVFrame *ref)
 
 void ComplexityAnalyzer::process_b_picture(YUVFrame *pict, YUVFrame *fwdref, YUVFrame *backref)
 {
-	int error = m_pPmv->predictBidirectional(pict, fwdref, backref, m_pB1mv, m_pB2mv, &m_mses[m_pPmv->firstMB()], &m_MB_modes[m_pPmv->firstMB()]);
+	int error = m_pPmv->predictBidirectional(pict, fwdref, backref, m_pB1mv, m_pB2mv, &m_mses.get()[m_pPmv->firstMB()], &m_MB_modes.get()[m_pPmv->firstMB()]);
 	int bits = m_pPmv->bits();
 
 	//We are weighting B-frames by 0% more bits (256/256), since QP needs to be highest among I/P/B
@@ -144,7 +141,7 @@ void ComplexityAnalyzer::process_b_picture(YUVFrame *pict, YUVFrame *fwdref, YUV
 
 void ComplexityAnalyzer::analyze()
 {
-	int td;
+	int td = 0;
 	int td_ref;
 	const int SGOP_size = 5;
 

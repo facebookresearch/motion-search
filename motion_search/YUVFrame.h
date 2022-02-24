@@ -1,7 +1,8 @@
 #pragma once
 
-#include "IVideoSequenceReader.h"
 #include "common.h"
+#include <motion_search/inc/memory.h>
+#include "IVideoSequenceReader.h"
 
 class YUVFrame
 {
@@ -27,7 +28,7 @@ private:
 	const int m_stride;
 	const int m_padded_height;
 
-	uint8_t *m_pFrame;
+    memory::aligned_unique_ptr<uint8_t> m_pFrame;
 	uint8_t *m_pY;
 	uint8_t *m_pU;
 	uint8_t *m_pV;
@@ -35,5 +36,8 @@ private:
 	IVideoSequenceReader *m_pReader;
 
 	int m_pos;
+
+    YUVFrame(YUVFrame &) = delete;
+    YUVFrame & operator = (YUVFrame &) = delete;
 };
 

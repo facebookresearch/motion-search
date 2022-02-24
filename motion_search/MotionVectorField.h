@@ -2,6 +2,8 @@
 
 #include "YUVFrame.h"
 
+#include <motion_search/inc/memory.h>
+
 class MotionVectorField
 {
 public:
@@ -29,14 +31,14 @@ public:
 
 	inline int firstMB(void) { return m_firstMB; }
 
-	inline MV *MVs(void) { return &m_pMVs[m_firstMB]; }
+	inline MV *MVs(void) { return &m_pMVs.get()[m_firstMB]; }
 
-	inline int *SADs(void) { return &m_pSADs[m_firstMB]; }
+	inline int *SADs(void) { return &m_pSADs.get()[m_firstMB]; }
 
 private:
-	MV  *m_pMVs;
-	int *m_pSADs;
-	int  m_numMVbytes;
+    memory::aligned_unique_ptr<MV> m_pMVs;
+    memory::aligned_unique_ptr<int> m_pSADs;
+    size_t m_num_blocks = 0;
 	int  m_firstMB;
 
 	int  m_width;
@@ -49,4 +51,7 @@ private:
 	int m_count_P;
 	int m_count_B;
 	int m_bits;
+
+    MotionVectorField(MotionVectorField &) = delete;
+    MotionVectorField & operator = (MotionVectorField &) = delete;
 };

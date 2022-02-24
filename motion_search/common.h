@@ -1,13 +1,55 @@
 #pragma once
 
+//
+// define the platform
+//
+
+#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+#if !defined(_WINDOWS)
+#define _WINDOWS 1
+#endif // !defined(_WINDOWS)
+// 4514 unreferenced inline function has been removed
+// 4710 function not inlined
+// 5045 Compiler will insert Spectre mitigation for memory load
+#pragma warning(disable: 4514 4710 5045)
+#else // !(defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64))
+#if !defined(_LINUX)
+#define _LINUX 1
+#endif // !defined(_LINUX)
+#endif // defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
+
+#if defined(_M_IX86) || (defined(__GNUC__) && defined(__i386__))
+#if !defined(_X86)
+#define _X86 1
+#endif // !defined(_X86)
+#endif // defined(_M_IX86) || (defined(__GNUC__) && defined(__i386__))
+
+#if defined(_M_X64) || (defined(__GNUC__) && defined(__x86_64__)) || defined(__amd64__)
+#if !defined(_X64)
+#define _X64 1
+#endif // !defined(_X64)
+#endif // defined(_M_X64) || (defined(__GNUC__) && defined(__x86_64__)) || defined(__amd64__)
+
+#include <stdint.h>
+
+
+#if defined(_X86) || defined(_X64)
+
+#if defined(_MSC_VER)
+#include <intrin.h>
+#elif defined(_LINUX)
+#include <x86intrin.h>
+#endif // defined(_MSC_VER)
+
+#elif defined(ARM) || defined(ARM64)
+
+#include <arm_neon.h>
+
+#endif // defined(_X86) || defined(_X64)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <emmintrin.h>
 
 // The following guarantee there is enough room for diamond search to search in extended area
 #define HORIZONTAL_PADDING 32
@@ -47,13 +89,26 @@ extern "C" {
 //We are weighting 16x16 MSE by -12.5%, since 8x8 will require more bits
 #define NORMALIZE(x) ((x*7+4)>>3)
 
-typedef struct {
-	// y component first, since it corresponds to row
-	// x component second - column
-	short y;
-	short x;
+typedef struct MV {
+    // y component first, since it corresponds to row
+    // x component second - column
+    short y;
+    short x;
 } MV;
 
+typedef struct DIM {
+    int32_t width;
+    int32_t height;
+} DIM;
+
 #ifdef __cplusplus
+} // extern "C" {
+
+inline
+DIM operator / (const DIM &left, const int32_t right) {
+    DIM dim = {
+        left.width / right, dim.height / right};
+    return dim;
 }
+
 #endif
