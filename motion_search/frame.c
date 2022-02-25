@@ -1,5 +1,7 @@
 #include "frame.h"
 
+#include <memory.h>
+
 // Pad frame
 int extend_frame(unsigned char *frame_ptr, int stride, int width, int height, int pad_size_x, int pad_size_y)
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include <motion_search/inc/common.h>
 #include <motion_search/inc/memory.h>
 #include "IVideoSequenceReader.h"
 

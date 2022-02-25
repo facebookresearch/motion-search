@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-#include "common.h"
+#include <motion_search/inc/common.h>
 
 int spatial_search(unsigned char *current,unsigned char *reference,
 				   int stride,int width,int height,int block_width,int block_height,

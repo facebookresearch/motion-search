@@ -1,8 +1,8 @@
 
 #include "motion_search.h"
 
-#include "common.h"
-#include "moments.h"
+#include <motion_search/inc/common.h>
+#include <motion_search/inc/moments.h>
 #include "frame.h"
 
 #include <stdlib.h>

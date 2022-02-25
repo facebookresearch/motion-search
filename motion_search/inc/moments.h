@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "common.h"
+#include <motion_search/inc/common.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -3,7 +3,7 @@
 
 #if defined(__cplusplus)
 
-#include <common.h>
+#include <motion_search/inc/common.h>
 
 #include <memory>
 #include <type_traits>

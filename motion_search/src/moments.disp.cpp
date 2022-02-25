@@ -1,5 +1,5 @@
 
-#include <moments.h>
+#include <motion_search/inc/moments.h>
 
 #include <motion_search/inc/cpu.h>
 #include <motion_search/inc/cpu_disp.h>
