@@ -1,4 +1,9 @@
+
 #include "moments.h"
+
+#include <motion_search/inc/intrinsic.h>
+
+#include <stdlib.h>
 
 // The following is a warning about no EMMS instruction for a function that uses MMX instructions
 // Disabled, since we don't use any float or double operations.
@@ -7,6 +12,8 @@
 // WxH SAD
 int fullSAD(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD)
 {
+    UNUSED(min_SAD);
+
 	int temp_SAD;
 	int diff;
 	int i, j;
@@ -53,6 +60,9 @@ int partialSAD(unsigned char *current, unsigned char *reference, int stride, int
 // 16xH SAD using SSE2 instructions
 int fastSAD16(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD)
 {
+    UNUSED(block_width);
+    UNUSED(min_SAD);
+
 	int i;
 	int temp_SAD;
 	__m128i xmm0, xmm1, xmm2;
@@ -79,6 +89,9 @@ int fastSAD16(unsigned char *current, unsigned char *reference, int stride, int 
 // 8xH SAD using MMX instructions
 int fastSAD8(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD)
 {
+    UNUSED(block_width);
+    UNUSED(min_SAD);
+
 	int i;
 	int temp_SAD;
 	__m64 mm0, mm1, mm2;
@@ -103,6 +116,9 @@ int fastSAD8(unsigned char *current, unsigned char *reference, int stride, int b
 // 4xH SAD using MMX instructions
 int fastSAD4(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD)
 {
+    UNUSED(block_width);
+    UNUSED(min_SAD);
+
 	int i;
 	int temp_SAD;
 	__m64 mm0, mm1, mm2;
@@ -161,6 +177,8 @@ int variance(unsigned char *current, int stride, int block_width, int block_heig
 // Fast sum of square differences
 int fast_variance16(unsigned char *current, int stride, int block_width, int block_height)
 {
+    UNUSED(block_width);
+
 	int i;
 	int temp, sum, sum2;
 	__m128i xmm0, xmm1, xmm2, xmm4, xmm5;
@@ -203,6 +221,8 @@ int fast_variance16(unsigned char *current, int stride, int block_width, int blo
 // Fast sum of square differences
 int fast_variance8(unsigned char *current, int stride, int block_width, int block_height)
 {
+    UNUSED(block_width);
+
 	int i;
 	int temp, sum, sum2;
 #if 0
@@ -272,6 +292,8 @@ int fast_variance8(unsigned char *current, int stride, int block_width, int bloc
 // Fast sum of square differences
 int fast_variance4(unsigned char *current, int stride, int block_width, int block_height)
 {
+    UNUSED(block_width);
+
 	int i;
 	int temp, sum, sum2;
 	__m64 mm0, mm1, mm2, mm3;
@@ -351,6 +373,8 @@ int calc_mse(unsigned char *current, unsigned char *reference, int stride, int b
 // Fast sum of square differences
 int fast_calc_mse16(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height)
 {
+    UNUSED(block_width);
+
 	int i;
 	int sum2;
 	__m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5;
@@ -413,6 +437,8 @@ int fast_calc_mse16(unsigned char *current, unsigned char *reference, int stride
 // Fast sum of square differences
 int fast_calc_mse8(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height)
 {
+    UNUSED(block_width);
+
 	int i;
 	int sum2;
 	__m64 mm0, mm1, mm2, mm3, mm4, mm5;
@@ -472,6 +498,8 @@ int fast_calc_mse8(unsigned char *current, unsigned char *reference, int stride,
 // Fast sum of square differences
 int fast_calc_mse4(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height)
 {
+    UNUSED(block_width);
+
 	int i;
 	int sum2;
 	__m64 mm0, mm1, mm2, mm3;
@@ -570,6 +598,8 @@ int bidir_mse(unsigned char *current, unsigned char *reference1, unsigned char *
 // Fast sum of square differences after bi-directional interpolation; we assume td1+td2 = 32768
 int fast_bidir_mse16(unsigned char *current, unsigned char *reference1, unsigned char *reference2, int stride, int block_width, int block_height, MV *td)
 {
+    UNUSED(block_width);
+
 	static const __declspec(align(16)) int constant_16384[4] = {16384, 16384, 16384, 16384};
 	int i;
 	int sum2;
@@ -669,6 +699,8 @@ int fast_bidir_mse16(unsigned char *current, unsigned char *reference1, unsigned
 // Fast sum of square differences after bi-directional interpolation; we assume td1+td2 = 32768
 int fast_bidir_mse8(unsigned char *current, unsigned char *reference1, unsigned char *reference2, int stride, int block_width, int block_height, MV *td)
 {
+    UNUSED(block_width);
+
 	static const __declspec(align(16)) int constant_16384[4] = {16384, 16384, 16384, 16384};
 	int i;
 	int sum2;
@@ -744,6 +776,8 @@ int fast_bidir_mse8(unsigned char *current, unsigned char *reference1, unsigned 
 // Fast sum of square differences after bi-directional interpolation; we assume td1+td2 = 32768
 int fast_bidir_mse4(unsigned char *current, unsigned char *reference1, unsigned char *reference2, int stride, int block_width, int block_height, MV *td)
 {
+    UNUSED(block_width);
+
 	static const __declspec(align(16)) int constant_16384[4] = {16384, 16384, 16384, 16384};
 	int i;
 	int sum2;

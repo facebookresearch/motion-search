@@ -1,51 +1,16 @@
+
 #pragma once
 
-//
-// define the platform
-//
+#include <motion_search/inc/xplatform.h>
 
-#if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-#if !defined(_WINDOWS)
-#define _WINDOWS 1
-#endif // !defined(_WINDOWS)
+#if defined(_WINDOWS)
 // 4514 unreferenced inline function has been removed
 // 4710 function not inlined
 // 5045 Compiler will insert Spectre mitigation for memory load
 #pragma warning(disable: 4514 4710 5045)
-#else // !(defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64))
-#if !defined(_LINUX)
-#define _LINUX 1
-#endif // !defined(_LINUX)
-#endif // defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)
-
-#if defined(_M_IX86) || (defined(__GNUC__) && defined(__i386__))
-#if !defined(_X86)
-#define _X86 1
-#endif // !defined(_X86)
-#endif // defined(_M_IX86) || (defined(__GNUC__) && defined(__i386__))
-
-#if defined(_M_X64) || (defined(__GNUC__) && defined(__x86_64__)) || defined(__amd64__)
-#if !defined(_X64)
-#define _X64 1
-#endif // !defined(_X64)
-#endif // defined(_M_X64) || (defined(__GNUC__) && defined(__x86_64__)) || defined(__amd64__)
+#endif // !defined(_WINDOWS)
 
 #include <stdint.h>
-
-
-#if defined(_X86) || defined(_X64)
-
-#if defined(_MSC_VER)
-#include <intrin.h>
-#elif defined(_LINUX)
-#include <x86intrin.h>
-#endif // defined(_MSC_VER)
-
-#elif defined(ARM) || defined(ARM64)
-
-#include <arm_neon.h>
-
-#endif // defined(_X86) || defined(_X64)
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,4 +76,4 @@ DIM operator / (const DIM &left, const int32_t right) {
     return dim;
 }
 
-#endif
+#endif // __cplusplus

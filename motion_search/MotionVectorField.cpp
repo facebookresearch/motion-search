@@ -2,12 +2,12 @@
 
 #include "motion_search.h"
 
-MotionVectorField::MotionVectorField(int width, int height, int stride, int padded_height, int blocksize) : m_width(width),
+MotionVectorField::MotionVectorField(int width, int height, int stride, int padded_height, int blocksize) : m_firstMB(width/MB_WIDTH+2 + 1),
+																											m_width(width),
 																											m_height(height),
 																											m_stride(stride),
 																											m_padded_height(padded_height),
 																											m_blocksize(blocksize),
-																											m_firstMB(width/MB_WIDTH+2 + 1),
 																											m_count_I(0),
 																											m_count_P(0),
 																											m_count_B(0)

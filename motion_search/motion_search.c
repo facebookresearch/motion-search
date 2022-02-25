@@ -1,7 +1,11 @@
+
+#include "motion_search.h"
+
 #include "common.h"
 #include "moments.h"
 #include "frame.h"
-#include "motion_search.h"
+
+#include <stdlib.h>
 
 #define RANGE_CLIP(low, val, high) ((val) < (low) ? (low) : ((val) > (high) ? (high) : (val)))
 
@@ -310,6 +314,8 @@ static int PMVFAST(unsigned char *current, unsigned char *reference, int stride,
 
 static int full_search(unsigned char *current,unsigned char *reference,int stride, MV *motion_vectors,int block_width,int block_height, int *SADs, t_SAD SAD)
 {
+    UNUSED(SADs);
+
 	int mvx, mvy;
 	int temp_SAD, min_SAD;
 	static const int search_range = 24;
@@ -401,6 +407,10 @@ int spatial_search(unsigned char *current,unsigned char *reference,
 				   MV *motion_vectors,int *SADs,int *mses,unsigned char *MB_modes,
 				   int *count_I,int *bits)
 {
+    UNUSED(reference);
+    UNUSED(motion_vectors);
+    UNUSED(SADs);
+
 	int i, j;
 	int block_mse, line_mse, mse;
 	int stride_MB = width/MB_WIDTH+2;

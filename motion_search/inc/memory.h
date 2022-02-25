@@ -3,6 +3,8 @@
 
 #if defined(__cplusplus)
 
+#include <common.h>
+
 #include <memory>
 #include <type_traits>
 
