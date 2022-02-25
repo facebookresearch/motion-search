@@ -22,9 +22,6 @@ extern "C" {
 #define HOR_PADDING_UV (HORIZONTAL_PADDING/2)
 #define VER_PADDING_UV (VERTICAL_PADDING/2)
 
-// USE_MMX_SSE should only be enabled on a Pentium 4 or higher Intel CPU
-#define USE_MMX_SSE
-
 // Currently, MB_WIDTH can take values 4, 8 or 16
 #define MB_WIDTH 16
 //#define MB_WIDTH 8

@@ -16,7 +16,7 @@ typedef union _offt
 }
 diamond_offset_t;
 
-typedef int (*t_SAD)(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD);
+typedef int (*t_SAD) (FAST_SAD_FORMAL_ARGS);
 
 static int diamond_search(unsigned char *current, unsigned char *reference, int stride, MV *motion_vector, int block_width, int block_height, const diamond_offset_t *offset, const int search_size, int min_SAD, const diamond_offset_t *next_diamond,t_SAD SAD)
 {

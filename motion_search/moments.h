@@ -1,48 +1,101 @@
+
 #pragma once
+
+#include "common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "common.h"
+/*
+    declare optimized functions callers
+*/
 
-int fullSAD(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD);
-int partialSAD(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD);
-int variance(unsigned char *current, int stride, int block_width, int block_height);
-int calc_mse(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height);
-int bidir_mse(unsigned char *current, unsigned char *reference1, unsigned char *reference2, int stride, int block_width, int block_height, MV *td);
-#if defined(USE_MMX_SSE)
+#define FAST_SAD_FORMAL_ARGS \
+    const uint8_t *current, const uint8_t *reference, const ptrdiff_t stride, \
+    int block_width, int block_height, int min_SAD
+#define FAST_SAD_ACTUAL_ARGS \
+    current, reference, stride, block_width, block_height, min_SAD
 
-int fastSAD16(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD);
-int fastSAD8(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD);
-int fastSAD4(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height, int min_SAD);
-int fast_variance16(unsigned char *current, int stride, int block_width, int block_height);
-int fast_variance8(unsigned char *current, int stride, int block_width, int block_height);
-int fast_variance4(unsigned char *current, int stride, int block_width, int block_height);
-int fast_calc_mse16(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height);
-int fast_calc_mse8(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height);
-int fast_calc_mse4(unsigned char *current, unsigned char *reference, int stride, int block_width, int block_height);
-int fast_bidir_mse16(unsigned char *current, unsigned char *reference1, unsigned char *reference2, int stride, int block_width, int block_height, MV *td);
-int fast_bidir_mse8(unsigned char *current, unsigned char *reference1, unsigned char *reference2, int stride, int block_width, int block_height, MV *td);
-int fast_bidir_mse4(unsigned char *current, unsigned char *reference1, unsigned char *reference2, int stride, int block_width, int block_height, MV *td);
+int fastSAD16(FAST_SAD_FORMAL_ARGS);
+int fastSAD8(FAST_SAD_FORMAL_ARGS);
+int fastSAD4(FAST_SAD_FORMAL_ARGS);
 
-#else
+#define FAST_VARIANCE_FORMAL_ARGS \
+    const uint8_t *current, const ptrdiff_t stride, int block_width, int block_height
+#define FAST_VARIANCE_ACTUAL_ARGS \
+    current, stride, block_width, block_height
 
-#define fastSAD16 partialSAD
-#define fastSAD8 partialSAD
-#define fastSAD4 partialSAD
-#define fast_variance16 variance
-#define fast_variance8 variance
-#define fast_variance4 variance
-#define fast_calc_mse16 calc_mse
-#define fast_calc_mse8 calc_mse
-#define fast_calc_mse4 calc_mse
-#define fast_bidir_mse16 bidir_mse
-#define fast_bidir_mse8 bidir_mse
-#define fast_bidir_mse4 bidir_mse
+int fast_variance16(FAST_VARIANCE_FORMAL_ARGS);
+int fast_variance8(FAST_VARIANCE_FORMAL_ARGS);
+int fast_variance4(FAST_VARIANCE_FORMAL_ARGS);
 
-#endif // USE_MMX_SSE
+#define FAST_MSE_FORMAL_ARGS \
+    const uint8_t *current, const uint8_t *reference, const ptrdiff_t stride, \
+    int block_width, int block_height
+#define FAST_MSE_ACTUAL_ARGS \
+    current, reference, stride, block_width, block_height
+
+int fast_calc_mse16(FAST_MSE_FORMAL_ARGS);
+int fast_calc_mse8(FAST_MSE_FORMAL_ARGS);
+int fast_calc_mse4(FAST_MSE_FORMAL_ARGS);
+
+#define FAST_BIDIR_MSE_FORMAL_ARGS \
+    const uint8_t *current, const uint8_t *reference1, const uint8_t *reference2, \
+    const ptrdiff_t stride, int block_width, int block_height, MV *td
+#define FAST_BIDIR_MSE_ACTUAL_ARGS \
+    current, reference1, reference2, stride, block_width, block_height, td
+
+int fast_bidir_mse16(FAST_BIDIR_MSE_FORMAL_ARGS);
+int fast_bidir_mse8(FAST_BIDIR_MSE_FORMAL_ARGS);
+int fast_bidir_mse4(FAST_BIDIR_MSE_FORMAL_ARGS);
+
+/*
+    declare reference functions
+*/
+
+int fastSAD16_c(FAST_SAD_FORMAL_ARGS);
+int fastSAD8_c(FAST_SAD_FORMAL_ARGS);
+int fastSAD4_c(FAST_SAD_FORMAL_ARGS);
+
+int fast_variance16_c(FAST_VARIANCE_FORMAL_ARGS);
+int fast_variance8_c(FAST_VARIANCE_FORMAL_ARGS);
+int fast_variance4_c(FAST_VARIANCE_FORMAL_ARGS);
+
+int fast_calc_mse16_c(FAST_MSE_FORMAL_ARGS);
+int fast_calc_mse8_c(FAST_MSE_FORMAL_ARGS);
+int fast_calc_mse4_c(FAST_MSE_FORMAL_ARGS);
+
+int fast_bidir_mse16_c(FAST_BIDIR_MSE_FORMAL_ARGS);
+int fast_bidir_mse8_c(FAST_BIDIR_MSE_FORMAL_ARGS);
+int fast_bidir_mse4_c(FAST_BIDIR_MSE_FORMAL_ARGS);
+
+/*
+    declare optimized functions
+*/
+
+#if defined(_X86) || defined(_X64)
+
+int fastSAD16_sse2(FAST_SAD_FORMAL_ARGS);
+int fastSAD8_sse2(FAST_SAD_FORMAL_ARGS);
+int fastSAD4_sse2(FAST_SAD_FORMAL_ARGS);
+
+int fast_variance16_sse2(FAST_VARIANCE_FORMAL_ARGS);
+int fast_variance8_sse2(FAST_VARIANCE_FORMAL_ARGS);
+int fast_variance4_sse2(FAST_VARIANCE_FORMAL_ARGS);
+
+int fast_calc_mse16_sse2(FAST_MSE_FORMAL_ARGS);
+int fast_calc_mse8_sse2(FAST_MSE_FORMAL_ARGS);
+int fast_calc_mse4_sse2(FAST_MSE_FORMAL_ARGS);
+
+int fast_bidir_mse16_sse2(FAST_BIDIR_MSE_FORMAL_ARGS);
+int fast_bidir_mse8_sse2(FAST_BIDIR_MSE_FORMAL_ARGS);
+int fast_bidir_mse4_sse2(FAST_BIDIR_MSE_FORMAL_ARGS);
+
+#elif defined(_ARM) || defined(_ARM64)
+
+#endif /* defined(_X86) || defined(_X64) */
 
 #ifdef __cplusplus
-}
+} // extern "C"
 #endif
