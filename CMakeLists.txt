@@ -70,8 +70,8 @@ target_include_directories(motion_search PRIVATE
   ${CMAKE_SOURCE_DIR}
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fpermissive -Wall -Wpedantic")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions -fpermissive -Wall -Wpedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fpermissive -Wall -Wpedantic -mxsave")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions -fpermissive -Wall -Wpedantic -mxsave")
 
 configure_file(motion_search.pc.in motion_search.pc @ONLY)
 

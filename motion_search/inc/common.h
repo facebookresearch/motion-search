@@ -10,6 +10,7 @@
 #pragma warning(disable: 4514 4710 5045)
 #endif // !defined(_WINDOWS)
 
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -69,7 +70,7 @@ typedef struct DIM {
 inline
 DIM operator / (const DIM &left, const int32_t right) {
     DIM dim = {
-        left.width / right, dim.height / right};
+        left.width / right, left.height / right};
     return dim;
 }
 
