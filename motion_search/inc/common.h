@@ -12,6 +12,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,5 +74,11 @@ DIM operator / (const DIM &left, const int32_t right) {
         left.width / right, left.height / right};
     return dim;
 }
+
+struct file_closer {
+    void operator () (FILE* f) {
+        fclose(f);
+    }
+};
 
 #endif // __cplusplus
