@@ -10,12 +10,10 @@
 #define RANGE_CLIP(low, val, high) \
     ((int16_t) ((val) < (low) ? (low) : ((val) > (high) ? (high) : (val))))
 
-typedef union _offt
+typedef struct diamond_offset_t
 {
-	MV mv;
-	short val[2];
-}
-diamond_offset_t;
+    MV mv;
+} diamond_offset_t;
 
 typedef int (*t_SAD) (FAST_SAD_FORMAL_ARGS);
 
@@ -29,15 +27,15 @@ static int diamond_search(unsigned char *current, unsigned char *reference, int 
 
 	do
 	{
-		for(i=0;(j=ptr[i].val[0])!=0;i++)
+		for(i=0;(j=ptr[i].mv.x)!=0;i++)
 		{
-			SAD_val[j] = SAD_val[ptr[i].val[1]];
+			SAD_val[j] = SAD_val[ptr[i].mv.y];
 		}
 		SAD_val[0] = min_SAD;
 		min_ind = 0;
 		for(i++;i<search_size;i++)
 		{
-			j = ptr[i].val[0];
+			j = ptr[i].mv.x;
 			SAD_val[j] = SAD(current, reference+offset[j].mv.y*stride+offset[j].mv.x, stride, block_width, block_height, min_SAD);
 			if(SAD_val[j]<min_SAD)
 			{
@@ -184,6 +182,9 @@ static const diamond_offset_t next_large_diamond[9*9] = {
 	{ 4, 0}, { 3, 2}, { 5, 6}, { 1, 2}, { 7, 6}, { 0, 8}, { 3, 3}, { 4, 4}, { 5, 5}
 };
 
+#define SIMPLE_SEARCH 0
+
+#if SIMPLE_SEARCH
 /*
   x4 x3 x2
   x5 x0 x1
@@ -203,7 +204,7 @@ static const diamond_offset_t next_small_block[9*9] = {
 	{ 6, 0}, { 1, 2}, { 3, 4}, { 0, 7}, { 2, 2}, { 4, 4}, { 5, 5}, { 7, 7}, { 8, 8}, 
 	{ 5, 0}, { 1, 3}, { 2, 4}, { 0, 8}, { 3, 3}, { 4, 4}, { 6, 6}, { 7, 7}, { 8, 8}
 };
-
+#endif // SIMPLE_SEARCH
 
 static int PMVFAST(unsigned char *current, unsigned char *reference, int stride, MV *motion_vectors, int block_width, int block_height, int *SADs, t_SAD SAD)
 {
@@ -291,7 +292,7 @@ static int PMVFAST(unsigned char *current, unsigned char *reference, int stride,
 
 		if(min_SAD>=T1)
 		{
-#if 0
+#if SIMPLE_SEARCH
 			min_SAD = diamond_search(current, reference+median.y*stride+median.x, stride, &median, block_width, block_height, small_block, 9, min_SAD, next_small_block, SAD);
 #else
 			//if(T2>7*area_multiplier)
@@ -312,7 +313,7 @@ static int PMVFAST(unsigned char *current, unsigned char *reference, int stride,
 	return min_SAD;	
 }
 
-
+/*
 static int full_search(unsigned char *current,unsigned char *reference,int stride, MV *motion_vectors,int block_width,int block_height, int *SADs, t_SAD SAD)
 {
     UNUSED(SADs);
@@ -375,7 +376,7 @@ static int full_search(unsigned char *current,unsigned char *reference,int strid
 
 	return min_SAD;
 }
-
+*/
 
 static void interpolate_mv(MV *mv1, MV *pMV, int width, int height, int block_width, int block_height, int pos_x, int pos_y, short td1)
 {
