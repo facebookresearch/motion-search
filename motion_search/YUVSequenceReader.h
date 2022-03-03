@@ -12,11 +12,11 @@ class YUVSequenceReader : public BaseVideoSequenceReader
 public:
     YUVSequenceReader (std::string fname, int width, int height);
     ~YUVSequenceReader (void) = default;
-    bool eof(void);
-    int nframes(void);
-    int width(void)  { return m_width; }
-    int height(void) { return m_height; }
-    int stride(void) { return m_stride; }
+    bool eof(void) override;
+    int nframes(void) override;
+    int width(void) override { return m_width; }
+    int height(void) override { return m_height; }
+    int stride(void) override { return m_stride; }
 
     bool isOpen(void) override {
         if ((!m_width) || (!m_height) || (!m_file.get())) {
@@ -27,7 +27,7 @@ public:
     }
 
 protected:
-    void readPicture(uint8_t *pY, uint8_t *pU, uint8_t *pV);
+    void readPicture(uint8_t *pY, uint8_t *pU, uint8_t *pV) override;
 
 private:
     const int m_width = 0;
