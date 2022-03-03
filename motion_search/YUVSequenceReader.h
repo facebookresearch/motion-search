@@ -16,7 +16,7 @@ public:
     int nframes(void) override;
     int width(void) override { return m_width; }
     int height(void) override { return m_height; }
-    int stride(void) override { return m_stride; }
+    ptrdiff_t stride(void) override { return m_stride; }
 
     bool isOpen(void) override {
         if ((!m_width) || (!m_height) || (!m_file.get())) {
@@ -32,7 +32,7 @@ protected:
 private:
     const int m_width = 0;
     const int m_height = 0;
-    const int m_stride = 0;
+    const ptrdiff_t m_stride = 0;
 
     const std::string m_filename;
     std::unique_ptr<FILE, file_closer> m_file;

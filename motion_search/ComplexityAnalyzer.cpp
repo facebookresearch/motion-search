@@ -31,16 +31,17 @@ ComplexityAnalyzer::ComplexityAnalyzer(IVideoSequenceReader *reader) :
 	int stride_MB = m_width/MB_WIDTH+2;
 	int padded_height_MB = (m_height+MB_WIDTH-1)/MB_WIDTH+2;
 
-	m_mses = memory::AlignedAlloc<int> ((stride_MB)*(padded_height_MB));
+    const size_t numItems = (size_t) (stride_MB) * (padded_height_MB);
+	m_mses = memory::AlignedAlloc<int> (numItems);
 	if(m_mses==NULL)
 	{
-		printf("Not enough memory (%zu bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(int),"m_mses");
+		printf("Not enough memory (%zu bytes) for %s\n",numItems * sizeof(int),"m_mses");
 		exit(-1);
 	}
-	m_MB_modes = memory::AlignedAlloc<unsigned char> ((stride_MB)*(padded_height_MB));
+	m_MB_modes = memory::AlignedAlloc<unsigned char> (numItems);
 	if(m_MB_modes==NULL)
 	{
-		printf("Not enough memory (%zu bytes) for %s\n",(stride_MB)*(padded_height_MB)*sizeof(unsigned char),"m_MB_modes");
+		printf("Not enough memory (%zu bytes) for %s\n", numItems * sizeof(unsigned char),"m_MB_modes");
 		exit(-1);
 	}
 }
@@ -174,20 +175,20 @@ void ComplexityAnalyzer::analyze()
 				process_i_picture(pics[0]);
 			}
 			else {
-				pics[0]->swapFrame(pics[m_subGOP_size]);
+				pics[0]->swapFrame(pics[(size_t) m_subGOP_size]);
 			}
 
 			for(td_ref = td; td < (m_GOP_size - 1) && (td - td_ref) < m_subGOP_size; td++) {
-				pics[td + 1 - td_ref]->readNextFrame();
+				pics[(size_t) (td + 1 - td_ref)]->readNextFrame();
 			}
 
-			process_p_picture(	/* target    */ pics[td - td_ref],
+			process_p_picture(	/* target    */ pics[(size_t) (td - td_ref)],
 								/* reference */ pics[0]);
 
 			for(int j = 1; j < td - td_ref; j++) {
-				process_b_picture(	/* target  */ pics[j],
+				process_b_picture(	/* target  */ pics[(size_t) j],
 									/* forward */ pics[0],
-									/* reverse */ pics[td - td_ref]);
+									/* reverse */ pics[(size_t) (td - td_ref)]);
 			}
 		}
 	}

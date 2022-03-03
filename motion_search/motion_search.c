@@ -7,7 +7,8 @@
 
 #include <stdlib.h>
 
-#define RANGE_CLIP(low, val, high) ((val) < (low) ? (low) : ((val) > (high) ? (high) : (val)))
+#define RANGE_CLIP(low, val, high) \
+    ((int16_t) ((val) < (low) ? (low) : ((val) > (high) ? (high) : (val))))
 
 typedef union _offt
 {
@@ -316,7 +317,7 @@ static int full_search(unsigned char *current,unsigned char *reference,int strid
 {
     UNUSED(SADs);
 
-	int mvx, mvy;
+	MV mv;
 	int temp_SAD, min_SAD;
 	static const int search_range = 24;
 	int limit;
@@ -332,46 +333,42 @@ static int full_search(unsigned char *current,unsigned char *reference,int strid
 	min_SAD = SAD(current,reference,stride,block_width,block_height, min_SAD);
 	motion_vectors->y = 0;
 	motion_vectors->x = 0;
-	for(mvy = 0, mvx = 1, limit=1;limit<search_range;limit++)
+	for(mv.y = 0, mv.x = 1, limit=1;limit<search_range;limit++)
 	{
-		for(;mvy<limit;mvy++,reference += stride)
+		for(;mv.y<limit;mv.y++,reference += stride)
 		{
-			temp_SAD = SAD(current,reference+mvx,stride,block_width,block_height, min_SAD);
+			temp_SAD = SAD(current,reference+mv.x,stride,block_width,block_height, min_SAD);
 			if(temp_SAD<min_SAD)
 			{
 				min_SAD = temp_SAD;
-				motion_vectors->y = mvy;
-				motion_vectors->x = mvx;
+				*motion_vectors = mv;
 			}
 		}
-		for(;mvx>(-limit);mvx--)
+		for(;mv.x>(-limit);mv.x--)
 		{
-			temp_SAD = SAD(current,reference+mvx,stride,block_width,block_height, min_SAD);
+			temp_SAD = SAD(current,reference+mv.x,stride,block_width,block_height, min_SAD);
 			if(temp_SAD<min_SAD)
 			{
 				min_SAD = temp_SAD;
-				motion_vectors->y = mvy;
-				motion_vectors->x = mvx;
+				*motion_vectors = mv;
 			}
 		}
-		for(;mvy>(-limit);mvy--,reference -= stride)
+		for(;mv.y>(-limit);mv.y--,reference -= stride)
 		{
-			temp_SAD = SAD(current,reference+mvx,stride,block_width,block_height, min_SAD);
+			temp_SAD = SAD(current,reference+mv.x,stride,block_width,block_height, min_SAD);
 			if(temp_SAD<min_SAD)
 			{
 				min_SAD = temp_SAD;
-				motion_vectors->y = mvy;
-				motion_vectors->x = mvx;
+				*motion_vectors = mv;
 			}
 		}
-		for(;mvx<=limit;mvx++)
+		for(;mv.x<=limit;mv.x++)
 		{
-			temp_SAD = SAD(current,reference+mvx,stride,block_width,block_height, min_SAD);
+			temp_SAD = SAD(current,reference+mv.x,stride,block_width,block_height, min_SAD);
 			if(temp_SAD<min_SAD)
 			{
 				min_SAD = temp_SAD;
-				motion_vectors->y = mvy;
-				motion_vectors->x = mvx;
+				*motion_vectors = mv;
 			}
 		}
 	}

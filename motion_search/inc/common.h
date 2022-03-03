@@ -6,8 +6,9 @@
 #if defined(_WINDOWS)
 // 4514 unreferenced inline function has been removed
 // 4710 function not inlined
+// 4820 'bytes' bytes padding added after construct 'member_name'
 // 5045 Compiler will insert Spectre mitigation for memory load
-#pragma warning(disable: 4514 4710 5045)
+#pragma warning(disable: 4514 4710 4820 5045)
 #endif // !defined(_WINDOWS)
 
 #include <stddef.h>
@@ -56,8 +57,8 @@ extern "C" {
 typedef struct MV {
     // y component first, since it corresponds to row
     // x component second - column
-    short y;
-    short x;
+    int16_t y;
+    int16_t x;
 } MV;
 
 typedef struct DIM {

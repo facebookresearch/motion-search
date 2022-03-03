@@ -23,9 +23,9 @@ std::unique_ptr<IVideoSequenceReader> getReader(std::string filename,
 {
     std::unique_ptr<IVideoSequenceReader> reader;
 
-    unsigned int pos = filename.find_last_of('.');
+    const size_t pos = filename.find_last_of('.');
 
-    if (pos <= filename.size())
+    if (std::string::npos != pos)
     {
         std::string ext = filename.substr(pos);
 

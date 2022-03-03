@@ -15,7 +15,7 @@ MotionVectorField::MotionVectorField(int width, int height, int stride, int padd
 	int i,j;
 	int stride_MB = width/MB_WIDTH+2;
 	int padded_height_MB = (height+MB_WIDTH-1)/MB_WIDTH+2;
-    m_num_blocks = stride_MB*padded_height_MB;
+    m_num_blocks = (size_t) stride_MB * padded_height_MB;
 
 	m_pMVs = memory::AlignedAlloc<MV> (m_num_blocks);
 	if (m_pMVs == NULL) {
