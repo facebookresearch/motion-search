@@ -11,6 +11,6 @@ public:
     virtual int count(void) = 0;
     virtual int width(void) = 0;
     virtual int height(void) = 0;
-    virtual int stride(void) = 0;
+    virtual ptrdiff_t stride(void) = 0;
     virtual bool isOpen(void) = 0;
 };

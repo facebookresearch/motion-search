@@ -12,7 +12,7 @@ using std::vector;
 
 typedef struct {
 	int  picNum;
-	char picType;
+	int picType;
 	int count_I;
 	int count_P;
 	int count_B;

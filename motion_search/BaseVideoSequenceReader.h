@@ -1,5 +1,9 @@
+
 #pragma once
+
+#include <motion_search/inc/common.h>
 #include "IVideoSequenceReader.h"
+
 class BaseVideoSequenceReader : public IVideoSequenceReader
 {
 public:

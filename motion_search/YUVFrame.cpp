@@ -12,11 +12,11 @@ YUVFrame::YUVFrame(IVideoSequenceReader *rdr) : m_width(rdr->width()),
 												m_pReader(rdr),
 												m_pos(-1)
 {
-	int frame_size = m_stride * m_padded_height * 3 * sizeof(uint8_t) / 2;
+	size_t frame_size = m_stride * m_padded_height * 3 * sizeof(uint8_t) / 2;
 
 	m_pFrame = memory::AlignedAlloc<uint8_t> (frame_size);
 	if (m_pFrame == NULL) {
-		printf("Not enough memory (%d bytes) for YUVFrame\n", frame_size);
+		printf("Not enough memory (%zu bytes) for YUVFrame\n", frame_size);
 		exit(-1);
 	}
 
@@ -59,20 +59,20 @@ static void extend_frame(unsigned char *frame_ptr, int stride, int width, int he
 
 	for(i=0;i<height;i++)
 	{
-		memset(frame_ptr-pad_size_x,frame_ptr[0],pad_size_x);
-		memset(frame_ptr+width,frame_ptr[width-1],pad_size_x);
+		memset(frame_ptr-pad_size_x,frame_ptr[0], (size_t) pad_size_x);
+		memset(frame_ptr+width,frame_ptr[width-1], (size_t) pad_size_x);
 		if(i==0)
 		{
 			for(j=-pad_size_y;j<0;j++)
 			{
-				memcpy(frame_ptr+j*stride-pad_size_x,frame_ptr-pad_size_x,stride);
+				memcpy(frame_ptr+j*stride-pad_size_x,frame_ptr-pad_size_x, (size_t) stride);
 			}
 		}
 		else if(i==(height-1))
 		{
 			for(j=1;j<=pad_size_y;j++)
 			{
-				memcpy(frame_ptr+j*stride-pad_size_x,frame_ptr-pad_size_x,stride);
+				memcpy(frame_ptr+j*stride-pad_size_x,frame_ptr-pad_size_x, (size_t) stride);
 			}
 		}
 		frame_ptr += stride;

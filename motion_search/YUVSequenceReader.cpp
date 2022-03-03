@@ -14,12 +14,12 @@ YUVSequenceReader::YUVSequenceReader(std::string fname, int width, int height) :
 
 void YUVSequenceReader::readComponent(uint8_t *pData, bool isLuma)
 {
-    int div = isLuma ? 1 : 2;
-    int height = m_height / div;
-    int width = m_width / div;
-    int stride = m_stride / div;
+    const uint32_t div = (uint32_t) (isLuma ? 1 : 2);
+    uint32_t height = m_height / div;
+    size_t width = m_width / div;
+    ptrdiff_t stride = m_stride / (ptrdiff_t) div;
 
-    for (int i = 0; i < height; i++)
+    for (uint32_t i = 0; i < height; i++)
     {
         if (fread(pData + i * stride, sizeof(uint8_t), width, m_file.get()) != width)
             throw EOFException();
