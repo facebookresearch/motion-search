@@ -16,6 +16,9 @@
 #include <stdio.h>
 
 #ifdef __cplusplus
+
+#include <memory>
+
 extern "C" {
 #endif
 
@@ -81,5 +84,7 @@ struct file_closer {
         fclose(f);
     }
 };
+
+using unique_file_t = std::unique_ptr<FILE, file_closer>;
 
 #endif // __cplusplus

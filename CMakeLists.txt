@@ -15,11 +15,12 @@ add_library(motion_search_lib
     "motion_search/src/memory.cpp"
     "motion_search/src/moments.disp.cpp"
     "motion_search/src/BaseVideoSequenceReader.cpp"
+    "motion_search/src/Y4MSequenceReader.cpp"
+    "motion_search/src/YUVSequenceReader.cpp"
     "motion_search/ComplexityAnalyzer.cpp"
     "motion_search/EOFException.cpp"
     "motion_search/MotionVectorField.cpp"
     "motion_search/YUVFrame.cpp"
-    "motion_search/YUVSequenceReader.cpp"
     "motion_search/moments.c"
     "motion_search/motion_search.c"
 )

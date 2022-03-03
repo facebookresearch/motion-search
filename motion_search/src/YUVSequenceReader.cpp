@@ -1,14 +1,18 @@
-#include "YUVSequenceReader.h"
+
+#include <motion_search/inc/YUVSequenceReader.h>
 #include "EOFException.h"
 
 #include <sys/stat.h>
 
-YUVSequenceReader::YUVSequenceReader(std::string fname, const DIM dim) :
-    m_dim(dim),
-    m_stride(dim.width + 2*HORIZONTAL_PADDING),
-    m_filename(fname),
-    m_file(fopen(fname.c_str(), "rb"))
-{
+bool YUVSequenceReader::Open(unique_file_t file, const std::string& path,
+    const DIM dim) {
+
+    m_dim = dim;
+    m_stride = dim.width + 2 * HORIZONTAL_PADDING;
+    m_filename = path;
+    m_file = std::move(file);
+
+    return true;
 }
 
 void YUVSequenceReader::readComponent(uint8_t *pData, bool isLuma)
@@ -48,4 +52,3 @@ int YUVSequenceReader::nframes(void)
     int picsize = m_dim.width * m_dim.height * 3 / 2;
     return (buf.st_size / picsize);
 }
-

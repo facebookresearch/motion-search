@@ -1,7 +1,8 @@
 
 #include "ComplexityAnalyzer.h"
 #include <motion_search/inc/fb_command_line_parser.h>
-#include "YUVSequenceReader.h"
+#include <motion_search/inc/Y4MSequenceReader.h>
+#include <motion_search/inc/YUVSequenceReader.h>
 
 #include <algorithm>
 #include <chrono>
@@ -18,7 +19,7 @@ struct CTX {
 
 };
 
-std::unique_ptr<IVideoSequenceReader> getReader(std::string filename,
+std::unique_ptr<IVideoSequenceReader> getReader(const std::string& filename,
     const DIM dim)
 {
     std::unique_ptr<IVideoSequenceReader> reader;
@@ -32,11 +33,24 @@ std::unique_ptr<IVideoSequenceReader> getReader(std::string filename,
         std::transform(ext.begin(), ext.end(), ext.begin(),
             [](int c){return (char)::tolower(c);});
 
+        unique_file_t file(fopen(filename.c_str(), "rb"));
+        if (!file) {
+            return nullptr;
+        }
+
         if (ext.compare(".yuv") == 0) {
-            reader.reset(new YUVSequenceReader(filename, dim));
-        }/* else if (ext.compare(".y4m") == 0) {
-            reader.reset(new Y4MSequenceReader(filename));
-        }*/
+            std::unique_ptr<YUVSequenceReader> p(new YUVSequenceReader());
+            if (p) {
+                p->Open(std::move(file), filename, dim);
+                reader = std::move(p);
+            }
+        } else if (ext.compare(".y4m") == 0) {
+            std::unique_ptr<Y4MSequenceReader> p(new Y4MSequenceReader);
+            if (p) {
+                p->Open(std::move(file), filename);
+                reader = std::move(p);
+            }
+        }
     }
 
     if ((!reader) || !reader->isOpen()) {
