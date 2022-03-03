@@ -27,15 +27,15 @@ static int diamond_search(unsigned char *current, unsigned char *reference, int 
 
 	do
 	{
-		for(i=0;(j=ptr[i].mv.x)!=0;i++)
+		for(i=0;(j=ptr[i].mv.y)!=0;i++)
 		{
-			SAD_val[j] = SAD_val[ptr[i].mv.y];
+			SAD_val[j] = SAD_val[ptr[i].mv.x];
 		}
 		SAD_val[0] = min_SAD;
 		min_ind = 0;
 		for(i++;i<search_size;i++)
 		{
-			j = ptr[i].mv.x;
+			j = ptr[i].mv.y;
 			SAD_val[j] = SAD(current, reference+offset[j].mv.y*stride+offset[j].mv.x, stride, block_width, block_height, min_SAD);
 			if(SAD_val[j]<min_SAD)
 			{
