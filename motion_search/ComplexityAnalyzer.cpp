@@ -1,16 +1,15 @@
 #include "ComplexityAnalyzer.h"
 #include "EOFException.h"
 
-#include "frame.h"
+#include <motion_search/inc/frame.h>
 #include <motion_search/inc/moments.h>
 #include "motion_search.h"
 
 
 ComplexityAnalyzer::ComplexityAnalyzer(IVideoSequenceReader *reader) :
-	m_width(reader->width()),
-	m_height(reader->height()),
-	m_stride(reader->width() + 2*HORIZONTAL_PADDING),
-	m_padded_height(reader->height() + 2*VERTICAL_PADDING),
+	m_dim(reader->dim()),
+	m_stride(reader->dim().width + 2 * HORIZONTAL_PADDING),
+	m_padded_height(reader->dim().height + 2 * VERTICAL_PADDING),
 	m_GOP_size(48),
 	m_subGOP_size(3),
 	m_pReader(reader),
@@ -24,12 +23,12 @@ ComplexityAnalyzer::ComplexityAnalyzer(IVideoSequenceReader *reader) :
 	for (int i = 0; i <= m_subGOP_size; i++)
 		pics.push_back(new YUVFrame(m_pReader));
 
-	m_pPmv  = new MotionVectorField(m_width, m_height, m_stride, m_padded_height, MB_WIDTH);
-	m_pB1mv = new MotionVectorField(m_width, m_height, m_stride, m_padded_height, MB_WIDTH);
-	m_pB2mv = new MotionVectorField(m_width, m_height, m_stride, m_padded_height, MB_WIDTH);
+    m_pPmv  = new MotionVectorField(m_dim, m_stride, m_padded_height, MB_WIDTH);
+    m_pB1mv = new MotionVectorField(m_dim, m_stride, m_padded_height, MB_WIDTH);
+    m_pB2mv = new MotionVectorField(m_dim, m_stride, m_padded_height, MB_WIDTH);
 
-	int stride_MB = m_width/MB_WIDTH+2;
-	int padded_height_MB = (m_height+MB_WIDTH-1)/MB_WIDTH+2;
+    int stride_MB = m_dim.width / MB_WIDTH + 2;
+    int padded_height_MB = (m_dim.height + MB_WIDTH - 1) / MB_WIDTH + 2;
 
     const size_t numItems = (size_t) (stride_MB) * (padded_height_MB);
 	m_mses = memory::AlignedAlloc<int> (numItems);

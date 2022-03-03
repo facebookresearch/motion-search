@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <motion_search/inc/common.h>
 
 class IVideoSequenceReader {
 public:
@@ -9,8 +9,7 @@ public:
     virtual bool eof(void) = 0;
     virtual int nframes(void) = 0;
     virtual int count(void) = 0;
-    virtual int width(void) = 0;
-    virtual int height(void) = 0;
+    virtual const DIM dim(void) = 0;
     virtual ptrdiff_t stride(void) = 0;
     virtual bool isOpen(void) = 0;
 };

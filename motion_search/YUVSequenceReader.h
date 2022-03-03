@@ -1,7 +1,8 @@
 #pragma once
 
 #include <motion_search/inc/common.h>
-#include "BaseVideoSequenceReader.h"
+
+#include <motion_search/inc/BaseVideoSequenceReader.h>
 
 #include <cstdio>
 #include <memory>
@@ -10,16 +11,15 @@
 class YUVSequenceReader : public BaseVideoSequenceReader
 {
 public:
-    YUVSequenceReader (std::string fname, int width, int height);
+    YUVSequenceReader (std::string fname, const DIM dim);
     ~YUVSequenceReader (void) = default;
     bool eof(void) override;
     int nframes(void) override;
-    int width(void) override { return m_width; }
-    int height(void) override { return m_height; }
+    const DIM dim(void) override { return m_dim; }
     ptrdiff_t stride(void) override { return m_stride; }
 
     bool isOpen(void) override {
-        if ((!m_width) || (!m_height) || (!m_file.get())) {
+        if ((!m_dim.width) || (!m_dim.height) || (!m_file.get())) {
             return false;
         } else {
             return true;
@@ -30,8 +30,7 @@ protected:
     void readPicture(uint8_t *pY, uint8_t *pU, uint8_t *pV) override;
 
 private:
-    const int m_width = 0;
-    const int m_height = 0;
+    const DIM m_dim = {0, 0};
     const ptrdiff_t m_stride = 0;
 
     const std::string m_filename;

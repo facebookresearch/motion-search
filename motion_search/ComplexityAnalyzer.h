@@ -2,8 +2,8 @@
 
 #include <motion_search/inc/common.h>
 
+#include <motion_search/inc/IVideoSequenceReader.h>
 #include <motion_search/inc/memory.h>
-#include "IVideoSequenceReader.h"
 #include "MotionVectorField.h"
 
 #include <vector>
@@ -29,8 +29,7 @@ public:
 	vector<complexity_info_t *> getInfo() { return m_info; }
 
 private:
-	int m_width;
-	int m_height;
+    DIM m_dim;
 	int m_stride;
 	int m_padded_height;
 

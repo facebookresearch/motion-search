@@ -11,29 +11,17 @@ add_compile_options(-fms-extensions)
 # Create library : libmotion_search_lib
 add_library(motion_search_lib
     "motion_search/src/cpu.c"
+    "motion_search/src/frame.c"
     "motion_search/src/memory.cpp"
     "motion_search/src/moments.disp.cpp"
-    "motion_search/BaseVideoSequenceReader.cpp"
-#    "motion_search/BaseVideoSequenceReader.h"
+    "motion_search/src/BaseVideoSequenceReader.cpp"
     "motion_search/ComplexityAnalyzer.cpp"
-#    "motion_search/ComplexityAnalyzer.h"
     "motion_search/EOFException.cpp"
-#    "motion_search/EOFException.h"
-#    "motion_search/IVideoSequenceReader.h"
     "motion_search/MotionVectorField.cpp"
-#    "motion_search/MotionVectorField.h"
     "motion_search/YUVFrame.cpp"
-#    "motion_search/YUVFrame.h"
     "motion_search/YUVSequenceReader.cpp"
-#    "motion_search/YUVSequenceReader.h"
-#    "motion_search/combine.bat"
-#    "motion_search/common.h"
-    "motion_search/frame.c"
-#    "motion_search/frame.h"
     "motion_search/moments.c"
-#    "motion_search/moments.h"
     "motion_search/motion_search.c"
-#    "motion_search/motion_search.h"
 )
 
 #

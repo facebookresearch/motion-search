@@ -19,7 +19,7 @@ struct CTX {
 };
 
 std::unique_ptr<IVideoSequenceReader> getReader(std::string filename,
-    int width, int height)
+    const DIM dim)
 {
     std::unique_ptr<IVideoSequenceReader> reader;
 
@@ -33,7 +33,7 @@ std::unique_ptr<IVideoSequenceReader> getReader(std::string filename,
             [](int c){return (char)::tolower(c);});
 
         if (ext.compare(".yuv") == 0) {
-            reader.reset(new YUVSequenceReader(filename, width, height));
+            reader.reset(new YUVSequenceReader(filename, dim));
         }/* else if (ext.compare(".y4m") == 0) {
             reader.reset(new Y4MSequenceReader(filename));
         }*/
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     }
 
     parse_options(ctx, args);
-    auto reader = getReader(ctx.inputFile, ctx.width, ctx.height);
+    auto reader = getReader(ctx.inputFile, {ctx.width, ctx.height});
     if (reader == nullptr) {
         fprintf(stderr, "Unsupported input format for %s\n", ctx.inputFile);
         return 1;
@@ -159,8 +159,8 @@ int main(int argc, char *argv[])
     }
 
     fprintf(out.get(), "input_file: '%s'\n", ctx.inputFile);
-    fprintf(out.get(), "width %d\n", reader->width());
-    fprintf(out.get(), "height %d\n", reader->height());
+    fprintf(out.get(), "width %d\n", reader->dim().width);
+    fprintf(out.get(), "height %d\n", reader->dim().height);
     fprintf(out.get(), "\n");
     fprintf(out.get(), "complexity info:\n");
 

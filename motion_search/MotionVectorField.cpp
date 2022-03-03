@@ -2,19 +2,19 @@
 
 #include "motion_search.h"
 
-MotionVectorField::MotionVectorField(int width, int height, int stride, int padded_height, int blocksize) : m_firstMB(width/MB_WIDTH+2 + 1),
-																											m_width(width),
-																											m_height(height),
-																											m_stride(stride),
-																											m_padded_height(padded_height),
-																											m_blocksize(blocksize),
-																											m_count_I(0),
-																											m_count_P(0),
-																											m_count_B(0)
+MotionVectorField::MotionVectorField(const DIM dim, int stride, int padded_height, int blocksize) :
+    m_firstMB(dim.width / MB_WIDTH + 2 + 1),
+    m_dim(dim),
+    m_stride(stride),
+    m_padded_height(padded_height),
+    m_blocksize(blocksize),
+    m_count_I(0),
+    m_count_P(0),
+    m_count_B(0)
 {
-	int i,j;
-	int stride_MB = width/MB_WIDTH+2;
-	int padded_height_MB = (height+MB_WIDTH-1)/MB_WIDTH+2;
+    int i,j;
+    int stride_MB = dim.width / MB_WIDTH + 2;
+    int padded_height_MB = (dim.height + MB_WIDTH - 1) / MB_WIDTH + 2;
     m_num_blocks = (size_t) stride_MB * padded_height_MB;
 
 	m_pMVs = memory::AlignedAlloc<MV> (m_num_blocks);
@@ -43,16 +43,10 @@ MotionVectorField::MotionVectorField(int width, int height, int stride, int padd
 	}
 }
 
-
-MotionVectorField::~MotionVectorField(void)
-{
-}
-
-
 int MotionVectorField::predictSpatial(YUVFrame *pFrm, int *mses, unsigned char *MB_modes)
 {
 	return spatial_search(pFrm->y(), pFrm->y(), 
-		pFrm->stride(), pFrm->width(), pFrm->height(), m_blocksize, m_blocksize, 
+		pFrm->stride(), pFrm->dim(), m_blocksize, m_blocksize, 
 		&m_pMVs.get()[m_firstMB], &m_pSADs.get()[m_firstMB], mses, MB_modes,
 		&m_count_I, &m_bits);
 
@@ -62,7 +56,7 @@ int MotionVectorField::predictSpatial(YUVFrame *pFrm, int *mses, unsigned char *
 int MotionVectorField::predictTemporal(YUVFrame *pCurFrm, YUVFrame *pRefFrm, int *mses, unsigned char *MB_modes)
 {
 	return motion_search(pCurFrm->y(), pRefFrm->y(), 
-		pCurFrm->stride(), pCurFrm->width(), pCurFrm->height(), m_blocksize, m_blocksize, 
+		pCurFrm->stride(), pCurFrm->dim(), m_blocksize, m_blocksize, 
 		&m_pMVs.get()[m_firstMB], &m_pSADs.get()[m_firstMB], mses, MB_modes,
 		&m_count_I, &m_count_P, &m_bits);
 }
@@ -77,7 +71,7 @@ int MotionVectorField::predictBidirectional(YUVFrame *pCurFrm, YUVFrame *pRefFrm
 	td1 = (short) ((pos*32768+total/2)/total);
 	td2 = (short) (32768 - td1);
 	return bidir_motion_search(pCurFrm->y(), pRefFrm1->y(), pRefFrm2->y(), 
-		pCurFrm->stride(), pCurFrm->width(), pCurFrm->height(), m_blocksize, m_blocksize, 
+		pCurFrm->stride(), pCurFrm->dim(), m_blocksize, m_blocksize, 
 		this->MVs(), fwdref->MVs(), bckref->MVs(), 
 		fwdref->SADs(), bckref->SADs(), mses, MB_modes, td1, td2,
 		&m_count_I, &m_count_P, &m_count_B, &m_bits);

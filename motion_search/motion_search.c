@@ -2,8 +2,8 @@
 #include "motion_search.h"
 
 #include <motion_search/inc/common.h>
+#include <motion_search/inc/frame.h>
 #include <motion_search/inc/moments.h>
-#include "frame.h"
 
 #include <stdlib.h>
 
@@ -378,20 +378,20 @@ static int full_search(unsigned char *current,unsigned char *reference,int strid
 }
 */
 
-static void interpolate_mv(MV *mv1, MV *pMV, int width, int height, int block_width, int block_height, int pos_x, int pos_y, short td1)
+static void interpolate_mv(MV *mv1, MV *pMV, const DIM dim, int block_width, int block_height, int pos_x, int pos_y, short td1)
 {
 	mv1->y = (td1*pMV->y+16384)>>15;
 	mv1->x = (td1*pMV->x+16384)>>15;
-	mv1->y = RANGE_CLIP(-block_height-pos_y, mv1->y, height-pos_y);
-	mv1->x = RANGE_CLIP(-block_width-pos_x, mv1->x, width-pos_x);
+	mv1->y = RANGE_CLIP(-block_height-pos_y, mv1->y, dim.height-pos_y);
+	mv1->x = RANGE_CLIP(-block_width-pos_x, mv1->x, dim.width-pos_x);
 }
 
-static void complementary_mv(MV *mv2, MV *mv1, MV *pMV, int width, int height, int block_width, int block_height, int pos_x, int pos_y)
+static void complementary_mv(MV *mv2, MV *mv1, MV *pMV, const DIM dim, int block_width, int block_height, int pos_x, int pos_y)
 {
 	mv2->y = mv1->y-pMV->y;
 	mv2->x = mv1->x-pMV->x;
-	mv2->y = RANGE_CLIP(-block_height-pos_y, mv2->y, height-pos_y);
-	mv2->x = RANGE_CLIP(-block_width-pos_x, mv2->x, width-pos_x);
+	mv2->y = RANGE_CLIP(-block_height-pos_y, mv2->y, dim.height-pos_y);
+	mv2->x = RANGE_CLIP(-block_width-pos_x, mv2->x, dim.width-pos_x);
 }
 
 static void copy_mv(MV *mv2, MV *mv1)
@@ -401,9 +401,9 @@ static void copy_mv(MV *mv2, MV *mv1)
 }
 
 int spatial_search(unsigned char *current,unsigned char *reference,
-				   int stride,int width,int height,int block_width,int block_height,
-				   MV *motion_vectors,int *SADs,int *mses,unsigned char *MB_modes,
-				   int *count_I,int *bits)
+    int stride, const DIM dim,int block_width,int block_height,
+    MV *motion_vectors,int *SADs,int *mses,unsigned char *MB_modes,
+    int *count_I,int *bits)
 {
     UNUSED(reference);
     UNUSED(motion_vectors);
@@ -411,22 +411,22 @@ int spatial_search(unsigned char *current,unsigned char *reference,
 
 	int i, j;
 	int block_mse, line_mse, mse;
-	int stride_MB = width/MB_WIDTH+2;
+	int stride_MB = dim.width / MB_WIDTH + 2;
 	int mbx;
 	int val,k;
 
 	mse = 0;
 	(*count_I) = 0;
 	(*bits) = 0;
-	for(i=0;i<height;i+=block_height)
+	for(i=0;i<dim.height;i+=block_height)
 	{
 		// Special case for 1920x1080 - works for all non-multiple of MBs height
-		if(i>height-block_height)
+		if(i>dim.height-block_height)
 		{
-			block_height = height-i;
+			block_height = dim.height-i;
 		}
 		line_mse = 0;
-		for(j=0,mbx=0;j<width;j+=block_width,mbx++)
+		for(j=0,mbx=0;j<dim.width;j+=block_width,mbx++)
 		{
 			int block_mse16, block_mse8;
 
@@ -473,29 +473,29 @@ int spatial_search(unsigned char *current,unsigned char *reference,
 
 
 int motion_search(unsigned char *current,unsigned char *reference,
-				  int stride,int width,int height,int block_width,int block_height,
-				  MV *motion_vectors,int *SADs,int *mses,unsigned char *MB_modes,
-				  int *count_I,int *count_P,int *bits)
+    int stride, const DIM dim,int block_width,int block_height,
+    MV *motion_vectors,int *SADs,int *mses,unsigned char *MB_modes,
+    int *count_I,int *count_P,int *bits)
 {
 	int i, j;
 	int temp_SAD;
 	int block_mse, line_mse, mse;
-	int stride_MB = width/MB_WIDTH+2;
+	int stride_MB = dim.width/MB_WIDTH+2;
 	int mbx;
 	int val,k;
 
 	mse = 0;
 	*count_I = *count_P = 0;
 	*bits = 0;
-	for(i=0;i<height;i+=block_height)
+	for(i=0;i<dim.height;i+=block_height)
 	{
 		// Special case for 1920x1080 - works for all non-multiple of MBs height
-		if(i>height-block_height)
+		if(i>dim.height-block_height)
 		{
-			block_height = height-i;
+			block_height = dim.height-i;
 		}
 		line_mse = 0;
-		for(j=0,mbx=0;j<width;j+=block_width,mbx++)
+		for(j=0,mbx=0;j<dim.width;j+=block_width,mbx++)
 		{
 			int var;
 			int block_mse16, block_mse8;
@@ -603,14 +603,14 @@ int motion_search(unsigned char *current,unsigned char *reference,
 
 //Assume td1+td2 = 32768 = 2^15
 int bidir_motion_search(unsigned char *current,unsigned char *reference1,unsigned char *reference2,
-						int stride,int width,int height,int block_width,int block_height,
+						int stride, const DIM dim,int block_width,int block_height,
 						MV *P_motion_vectors,MV *motion_vectors1,MV *motion_vectors2,
 						int *SADs1,int *SADs2,int *mses,unsigned char *MB_modes,short td1,short td2,
 						int *count_I,int *count_P,int *count_B,int *bits)
 {
 	int i, j;
 	int block_mse, block_mse1, block_mse2, line_mse, mse;
-	int stride_MB = width/MB_WIDTH+2;
+	int stride_MB = dim.width/MB_WIDTH+2;
 	int mbx;
 	MV td = { td1, td2};
 	int temp_SAD;
@@ -619,15 +619,15 @@ int bidir_motion_search(unsigned char *current,unsigned char *reference1,unsigne
 	mse = 0;
 	*count_I = *count_P = *count_B = 0;
 	*bits = 0;
-	for(i=0;i<height;i+=block_height)
+	for(i=0;i<dim.height;i+=block_height)
 	{
 		// Special case for 1920x1080 - works for all non-multiple of MBs height
-		if(i>height-block_height)
+		if(i>dim.height-block_height)
 		{
-			block_height = height-i;
+			block_height = dim.height-i;
 		}
 		line_mse = 0;
-		for(j=0,mbx=0;j<width;j+=block_width,mbx++)
+		for(j=0,mbx=0;j<dim.width;j+=block_width,mbx++)
 		{
 			int var;
 			MV *mv1 = &motion_vectors1[mbx];
@@ -665,7 +665,7 @@ int bidir_motion_search(unsigned char *current,unsigned char *reference1,unsigne
 
 			if(td1<=td2)
 			{
-				interpolate_mv(mv1, &P_motion_vectors[mbx], width, height, block_width, block_height, j, i, td1);
+				interpolate_mv(mv1, &P_motion_vectors[mbx], dim, block_width, block_height, j, i, td1);
 
 				// Try 16x16 mode first
 				temp_SAD = SEARCH_MV(current+j,reference1+j,stride,mv1,16,block_height,&SADs1[mbx],fastSAD16);
@@ -717,7 +717,7 @@ int bidir_motion_search(unsigned char *current,unsigned char *reference1,unsigne
 					SADs1[mbx] = 0;
 				}
 
-				complementary_mv(mv2, mv1, &P_motion_vectors[mbx], width, height, block_width, block_height, j, i);
+				complementary_mv(mv2, mv1, &P_motion_vectors[mbx], dim, block_width, block_height, j, i);
 
 				// Try 16x16 mode first
 				temp_SAD = SEARCH_MV(current+j,reference2+j,stride,mv2,16,block_height,&SADs2[mbx],fastSAD16);
@@ -794,7 +794,7 @@ int bidir_motion_search(unsigned char *current,unsigned char *reference1,unsigne
 			}
 			else
 			{
-				interpolate_mv(mv2, &P_motion_vectors[mbx], width, height, block_width, block_height, j, i, -td2);
+				interpolate_mv(mv2, &P_motion_vectors[mbx], dim, block_width, block_height, j, i, -td2);
 
 				// Try 16x16 mode first
 				temp_SAD = SEARCH_MV(current+j,reference2+j,stride,mv2,16,block_height,&SADs2[mbx],fastSAD16);
@@ -846,7 +846,7 @@ int bidir_motion_search(unsigned char *current,unsigned char *reference1,unsigne
 					SADs2[mbx] = 0;
 				}
 
-				complementary_mv(mv1, &P_motion_vectors[mbx], mv2, width, height, block_width, block_height, j, i);
+				complementary_mv(mv1, &P_motion_vectors[mbx], mv2, dim, block_width, block_height, j, i);
 
 				// Try 16x16 mode first
 				temp_SAD = SEARCH_MV(current+j,reference1+j,stride,mv1,16,block_height,&SADs1[mbx],fastSAD16);

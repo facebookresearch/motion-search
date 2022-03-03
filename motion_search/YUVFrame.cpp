@@ -1,16 +1,19 @@
+
 #include "YUVFrame.h"
+
+#include <motion_search/inc/frame.h>
 
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
 
 
-YUVFrame::YUVFrame(IVideoSequenceReader *rdr) : m_width(rdr->width()),
-												m_height(rdr->height()),
-												m_stride(rdr->width() + 2 * HORIZONTAL_PADDING),
-												m_padded_height(rdr->height() + 2 * VERTICAL_PADDING),
-												m_pReader(rdr),
-												m_pos(-1)
+YUVFrame::YUVFrame(IVideoSequenceReader *rdr) :
+    m_dim(rdr->dim()),
+    m_stride(rdr->dim().width + 2 * HORIZONTAL_PADDING),
+    m_padded_height(rdr->dim().height + 2 * VERTICAL_PADDING),
+    m_pReader(rdr),
+    m_pos(-1)
 {
 	size_t frame_size = m_stride * m_padded_height * 3 * sizeof(uint8_t) / 2;
 
@@ -29,12 +32,6 @@ YUVFrame::YUVFrame(IVideoSequenceReader *rdr) : m_width(rdr->width()),
 	m_pV = m_pFrame.get() + cb_offset;
 }
 
-
-YUVFrame::~YUVFrame(void)
-{
-}
-
-
 void YUVFrame::swapFrame (YUVFrame *other)
 {
 	std::swap(this->m_pFrame, other->m_pFrame);
@@ -51,38 +48,9 @@ void YUVFrame::readNextFrame(void)
 	m_pReader->read(y(), u(), v());
 }
 
-
-// Pad frame
-static void extend_frame(unsigned char *frame_ptr, int stride, int width, int height, int pad_size_x, int pad_size_y)
-{
-	int i, j;
-
-	for(i=0;i<height;i++)
-	{
-		memset(frame_ptr-pad_size_x,frame_ptr[0], (size_t) pad_size_x);
-		memset(frame_ptr+width,frame_ptr[width-1], (size_t) pad_size_x);
-		if(i==0)
-		{
-			for(j=-pad_size_y;j<0;j++)
-			{
-				memcpy(frame_ptr+j*stride-pad_size_x,frame_ptr-pad_size_x, (size_t) stride);
-			}
-		}
-		else if(i==(height-1))
-		{
-			for(j=1;j<=pad_size_y;j++)
-			{
-				memcpy(frame_ptr+j*stride-pad_size_x,frame_ptr-pad_size_x, (size_t) stride);
-			}
-		}
-		frame_ptr += stride;
-	}
-}
-
-
 void YUVFrame::boundaryExtend(void)
 {
-	extend_frame(y(), m_stride, m_width, m_height, HORIZONTAL_PADDING, VERTICAL_PADDING);
-	extend_frame(u(), m_stride>>1, m_width>>1, m_height>>1, HOR_PADDING_UV, VER_PADDING_UV);
-	extend_frame(v(), m_stride>>1, m_width>>1, m_height>>1, HOR_PADDING_UV, VER_PADDING_UV);
+    extend_frame(y(), m_stride, m_dim, HORIZONTAL_PADDING, VERTICAL_PADDING);
+    extend_frame(u(), m_stride>>1, m_dim / 2, HOR_PADDING_UV, VER_PADDING_UV);
+    extend_frame(v(), m_stride>>1, m_dim / 2, HOR_PADDING_UV, VER_PADDING_UV);
 }
