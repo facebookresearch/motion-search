@@ -51,12 +51,15 @@ set_target_properties(motion_search_lib PROPERTIES PUBLIC_HEADER motion_search/m
 
 target_include_directories(motion_search_lib PRIVATE
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/motion_search
 )
 target_include_directories(motion_search_lib_sse2 PRIVATE
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/motion_search
 )
 target_include_directories(motion_search PRIVATE
   ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/motion_search
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fpermissive -Wall -Wpedantic -mxsave")
