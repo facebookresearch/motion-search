@@ -5,8 +5,6 @@
  LICENSE file in the root directory of this source tree.
  */
 
-// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
-
 #pragma once
 
 #if !defined(__FB_COMMAND_LINE_PARSER_H)
