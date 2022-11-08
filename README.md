@@ -7,6 +7,7 @@ Contents:
 - [Requirements](#requirements)
 - [Building](#building)
 - [Running](#running)
+  - [Options](#options)
 - [License](#license)
 
 ## Requirements
@@ -49,7 +50,21 @@ For example:
 motion-search input.yuv -W=1920 -H=1080 stats.txt
 ```
 
-The input file can be a `.yuv` or `.y4m` file.
+The input file must be a `.yuv` or `.y4m` file.
+
+The output file will be a CSV file containing the following columns:
+
+- `picNum`: picture number
+- `picType`: picture type (I, P, B)
+- `count_I`: number of I blocks
+- `count_P`: number of P blocks
+- `count_B`: number of B blocks
+- `error`: mean squared error
+- `bits`: number of bits estimated
+
+The tool will print extra information to stderr, such as the number of frames processed, per-GOP stats, and total algorithm execution time.
+
+### Options
 
 You can use `-g` to control GOP size (default 150), `-n` to control
 number of frames to read (default is to read all) and `-b` to control

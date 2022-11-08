@@ -79,50 +79,50 @@ const char *const BFrames = "b";
 
 void PrintUsage(const char *const appName) {
 
-  printf(
+  fprintf(stderr, 
       "Usage: %s <input_file> [-%s=<width>] [-%s=<height>] [-%s=<num_frames>] "
       "[-%s=<color_format>] [-%s=<gop>] [-%s=<bframes>] <output_file>\n",
       appName, Options::Width, Options::Height, Options::NumFrames,
       Options::ColorFormat, Options::Gop, Options::BFrames);
-  printf("\n");
-  printf("Parameters:\n");
-  printf("<input_file> ... The file to be read. It can be a '.yuv' or '.y4m' "
+  fprintf(stderr, "\n");
+  fprintf(stderr, "Parameters:\n");
+  fprintf(stderr, "<input_file> ... The file to be read. It can be a '.yuv' or '.y4m' "
          "file containing YUV frames,\n");
-  printf(
+  fprintf(stderr, 
       "                 At present only these two file types are supported\n");
-  printf("\n");
-  printf("<width> ........ The width of the picture in the file. This "
+  fprintf(stderr, "\n");
+  fprintf(stderr, "<width> ........ The width of the picture in the file. This "
          "parameter must be passed\n");
-  printf(
+  fprintf(stderr, 
       "                 in for '.yuv' file types. Ignored for '.y4m' files.\n");
-  printf("                 Note the input picture is not resampled. This "
+  fprintf(stderr, "                 Note the input picture is not resampled. This "
          "parameter\n");
-  printf("                 is only used to get the picture size for files that "
+  fprintf(stderr, "                 is only used to get the picture size for files that "
          "do not have any\n");
-  printf("                 mechanism to signal it.\n");
-  printf("\n");
-  printf("<height> ....... The height of the picture in the file. This "
+  fprintf(stderr, "                 mechanism to signal it.\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "<height> ....... The height of the picture in the file. This "
          "parameter must be passed\n");
-  printf(
+  fprintf(stderr, 
       "                 in for '.yuv' file types. Ignored for '.y4m' files.\n");
-  printf("                 Note the input picture is not resampled. This "
+  fprintf(stderr, "                 Note the input picture is not resampled. This "
          "parameter\n");
-  printf("                 is only used to get the picture size for files that "
+  fprintf(stderr, "                 is only used to get the picture size for files that "
          "do not have any\n");
-  printf("                 mechanism to signal it.\n");
-  printf("\n");
-  printf("<num_frames> ... The number of frames to procees (default: the whole "
+  fprintf(stderr, "                 mechanism to signal it.\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "<num_frames> ... The number of frames to procees (default: the whole "
          "stream)\n");
-  printf("\n");
-  printf("<color_format> . The used color format, ignored for '.y4m' file "
+  fprintf(stderr, "\n");
+  fprintf(stderr, "<color_format> . The used color format, ignored for '.y4m' file "
          "types (default: I420)\n");
-  printf("\n");
-  printf("<gop> .......... GOP size to use (default: 150)\n");
-  printf("<bframes> ...... number of consecutive B-frames (default: 0)\n");
-  printf("\n");
-  printf("<output_file> .. The complexity information is written out to this "
+  fprintf(stderr, "\n");
+  fprintf(stderr, "<gop> .......... GOP size to use (default: 150)\n");
+  fprintf(stderr, "<bframes> ...... number of consecutive B-frames (default: 0)\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "<output_file> .. The complexity information is written out to this "
          "file.\n");
-  printf("\n");
+  fprintf(stderr, "\n");
   exit(-1);
 }
 
@@ -133,8 +133,8 @@ void parse_options(CTX &ctx, facebook::CommandLineParser &args,
     exit(-1);
   }
 
-  if (2 > args.NumFileNames()) {
-    printf("provide 2 files (a source then an output)\n");
+  if (args.NumFileNames() < 2) {
+    fprintf(stderr, "\nError: You must provide two file names, input and output\n");
     exit(-1);
   }
 
@@ -147,30 +147,29 @@ void parse_options(CTX &ctx, facebook::CommandLineParser &args,
   ctx.b_frames = args.Get<int32_t>(Options::BFrames, 0);
 
   if (ctx.gop_size < 1) {
-    printf("invalid gop size specified\n");
+    fprintf(stderr, "invalid gop size specified\n");
     exit(-1);
   }
 
   if (ctx.b_frames < 0) {
-    printf("invalid number of b-frames specified\n");
+    fprintf(stderr, "invalid number of b-frames specified\n");
     exit(-1);
   }
 }
 
+/**
+ * @brief Print the complexity information to the output file in CSV format
+ * 
+ * @param pOut The output file
+ * @param i The complexity information
+ */
 void print_compl_inf(FILE *const pOut, complexity_info_t *i) {
   static int GOP_bits = 0;
   static int GOP_count = 0;
 
-  if (i->picType == 'I' && i->picNum > 1) {
-    fprintf(pOut, "GOP: %4d, GOP-bits = %d\n", GOP_count, GOP_bits);
-    GOP_count++;
-    GOP_bits = 0;
-  }
-
   GOP_bits += i->bits;
-  fprintf(pOut, "Frame %6d (%c), I:%6d, P:%6d, B:%6d, MSE = %9d, bits = %7d\n",
-          i->picNum, i->picType, i->count_I, i->count_P, i->count_B, i->error,
-          i->bits);
+  fprintf(pOut, "%d,%c,%d,%d,%d,%d,%d\n", i->picNum, i->picType,
+          i->count_I, i->count_P, i->count_B, i->error, i->bits);
 }
 
 } // namespace
@@ -203,18 +202,20 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  fprintf(out.get(), "input_file: '%s'\n", ctx.inputFile);
-  fprintf(out.get(), "width %d\n", reader->dim().width);
-  fprintf(out.get(), "height %d\n", reader->dim().height);
-  fprintf(out.get(), "\n");
-  fprintf(out.get(), "complexity info:\n");
+  fprintf(stderr, "Input file: '%s'\n", ctx.inputFile);
+  fprintf(stderr, "width: %d\n", reader->dim().width);
+  fprintf(stderr, "height: %d\n", reader->dim().height);
 
+  // write CSV header
+  fprintf(out.get(), "picNum,picType,count_I,count_P,count_B,error,bits\n");
+
+  // write each frame data individually
   vector<complexity_info_t *> info = analyzer.getInfo();
   for_each(info.begin(), info.end(),
            [&](complexity_info_t *i) { print_compl_inf(out.get(), i); });
 
   const std::chrono::duration<double, std::milli> duration = end - begin;
-  fprintf(out.get(), "Execution time = %.2f msec\n", duration.count());
+  fprintf(stderr, "Execution time: %.2f msec\n", duration.count());
 
   return 0;
 }

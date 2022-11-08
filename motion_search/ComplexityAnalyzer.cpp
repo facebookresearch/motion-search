@@ -38,13 +38,13 @@ ComplexityAnalyzer::ComplexityAnalyzer(IVideoSequenceReader *reader,
   const size_t numItems = (size_t)(stride_MB) * (padded_height_MB);
   m_mses = memory::AlignedAlloc<int>(numItems);
   if (m_mses == NULL) {
-    printf("Not enough memory (%zu bytes) for %s\n", numItems * sizeof(int),
+    fprintf(stderr, "Not enough memory (%zu bytes) for %s\n", numItems * sizeof(int),
            "m_mses");
     exit(-1);
   }
   m_MB_modes = memory::AlignedAlloc<unsigned char>(numItems);
   if (m_MB_modes == NULL) {
-    printf("Not enough memory (%zu bytes) for %s\n",
+    fprintf(stderr, "Not enough memory (%zu bytes) for %s\n",
            numItems * sizeof(unsigned char), "m_MB_modes");
     exit(-1);
   }
@@ -99,7 +99,7 @@ void ComplexityAnalyzer::process_i_picture(YUVFrame *pict) {
   m_GOP_error += error;
   add_info(m_pReader->count(), 'I', error, m_pPmv->count_I(), 0, 0, bits);
   // for debugging
-  // printf("Frame %6d (I), I:%6d, P:%6d, B:%6d, MSE = %9d, bits =
+  // fprintf(stderr, "Frame %6d (I), I:%6d, P:%6d, B:%6d, MSE = %9d, bits =
   // %7d\n",pict->pos()+1,m_pPmv->count_I(),0,0,error,bits);
   pict->boundaryExtend();
 }
@@ -118,7 +118,7 @@ void ComplexityAnalyzer::process_p_picture(YUVFrame *pict, YUVFrame *ref) {
   add_info(m_pReader->count(), 'P', error, m_pPmv->count_I(), m_pPmv->count_P(),
            0, bits);
   // for debugging
-  // printf("Frame %6d (P), I:%6d, P:%6d, B:%6d, MSE = %9d, bits =
+  // fprintf(stderr, "Frame %6d (P), I:%6d, P:%6d, B:%6d, MSE = %9d, bits =
   // %7d\n",pict->pos()+1,m_pPmv->count_I(),m_pPmv->count_P(),0,error,bits);
   pict->boundaryExtend();
 }
@@ -138,7 +138,7 @@ void ComplexityAnalyzer::process_b_picture(YUVFrame *pict, YUVFrame *fwdref,
   add_info(m_pReader->count() - (backref->pos() - pict->pos()), 'B', error,
            m_pPmv->count_I(), m_pPmv->count_P(), m_pPmv->count_B(), bits);
   // for debugging
-  // printf("Frame %6d (B), I:%6d, P:%6d, B:%6d, MSE = %9d, bits =
+  // fprintf(stderr, "Frame %6d (B), I:%6d, P:%6d, B:%6d, MSE = %9d, bits =
   // %7d\n",pict->pos()+1,m_pPmv->count_I(),m_pPmv->count_P(),m_pPmv->count_B(),error,bits);
 }
 
@@ -149,11 +149,11 @@ void ComplexityAnalyzer::analyze() {
   try {
     while (m_num_frames > 0 ? m_pReader->count() < m_num_frames
                             : !m_pReader->eof()) {
-      printf("picture #%d\r", m_pReader->count() - 1);
+      fprintf(stderr, "Picture count: %d\r", m_pReader->count() - 1);
 
       if ((m_pReader->count() % m_GOP_size) == 0) {
         if (m_pReader->count()) {
-          printf("GOP: %3d, GOP-bits = %d\n", m_GOP_count, m_GOP_bits);
+          fprintf(stderr, "GOP: %d, GOP-bits: %d\n", m_GOP_count, m_GOP_bits);
           m_GOP_count++;
         }
         m_GOP_error = 0;
@@ -181,11 +181,11 @@ void ComplexityAnalyzer::analyze() {
       }
     }
   } catch (EOFException &e) {
-    printf("\n%s\n", e.what());
+    fprintf(stderr, "\n%s\n", e.what());
   }
 
   if (m_pReorderedInfo != NULL)
     m_info.push_back(m_pReorderedInfo);
 
-  printf("Processed %d frames\n", m_pReader->count());
+  fprintf(stderr, "Processed frames: %d\n", m_pReader->count());
 }

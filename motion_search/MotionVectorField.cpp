@@ -20,14 +20,14 @@ MotionVectorField::MotionVectorField(const DIM dim, int stride,
 
   m_pMVs = memory::AlignedAlloc<MV>(m_num_blocks);
   if (m_pMVs == NULL) {
-    printf("Not enough memory (%zu bytes) for motion vectors\n",
+    fprintf(stderr, "Not enough memory (%zu bytes) for motion vectors\n",
            m_num_blocks * sizeof(MV));
     exit(-1);
   }
 
   m_pSADs = memory::AlignedAlloc<int>(m_num_blocks);
   if (m_pSADs == NULL) {
-    printf("Not enough memory (%zu bytes) for SADs\n",
+    fprintf(stderr, "Not enough memory (%zu bytes) for SADs\n",
            m_num_blocks * sizeof(int));
     exit(-1);
   }
