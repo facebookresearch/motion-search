@@ -22,7 +22,7 @@ YUVFrame::YUVFrame(IVideoSequenceReader *rdr)
 
   m_pFrame = memory::AlignedAlloc<uint8_t>(frame_size);
   if (m_pFrame == NULL) {
-    printf("Not enough memory (%zu bytes) for YUVFrame\n", frame_size);
+    fprintf(stderr, "Not enough memory (%zu bytes) for YUVFrame\n", frame_size);
     exit(-1);
   }
 
